@@ -24,7 +24,14 @@
 
 #ifndef __cplusplus
 
-#if __STDC_VERSION__ >= 202311L
+/* Workaround: GCC 13 to 14, and Clang 15 to 17, all targets: their C23 mode
+ * reports 202000L, the value they give the drafts of C23. That of Clang 15
+ * lacks much of C23, but has the keywords bool, true, and false.
+ */
+#if __STDC_VERSION__ >= 202311L \
+ || (__STDC_VERSION__ > 201710L \
+     && ((defined(__clang__) && __clang_major__ >= 15) \
+         || (!defined(__clang__) && __GNUC__ >= 13)))
     /* These do not need to be defined for C23+. */
 #else
 #  undef bool

@@ -35,7 +35,13 @@
 
 #ifndef __cplusplus
 
-#if __STDC_VERSION__ >= 202311L
+/* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
+ * reports 202000L, the value they give the drafts of C23.
+ */
+#if __STDC_VERSION__ >= 202311L \
+ || (__STDC_VERSION__ > 201710L \
+     && ((defined(__clang__) && __clang_major__ >= 16) \
+         || (!defined(__clang__) && __GNUC__ >= 13)))
     /* These do not need to be defined for C23+. */
 #else
 #  undef alignas

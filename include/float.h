@@ -124,8 +124,14 @@
 
 #endif
 
+/* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
+ * reports 202000L, the value they give the drafts of C23.
+ */
 #if (defined(__cplusplus) && __cplusplus > 202302L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
+     && ((defined(__clang__) && __clang_major__ >= 16) \
+         || (!defined(__clang__) && __GNUC__ >= 13)))
 
 #define __STDC_VERSION_FLOAT_H__ 202311L
 
@@ -174,7 +180,7 @@
 #  define LDBL_IS_IEC_60559 __FREESTANDING_C_HDRS_IS_IEC_60559(__LDBL_MANT_DIG__, __LDBL_MIN_EXP__, __LDBL_MAX_EXP__)
 #endif
 
-/* Workaround: Clang 17 to 18, all targets: it does not tell the largest
+/* Workaround: Clang 16 to 18, all targets: it does not tell the largest
  * normalised numbers. Those are the largest finite numbers, except for the
  * double-double long double of PowerPC, where it is (1 - 2^-106) * 2^1023.
  */

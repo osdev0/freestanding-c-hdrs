@@ -20,8 +20,14 @@
 typedef __builtin_va_list va_list;
 
 #undef va_start
+/* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
+ * reports 202000L, the value they give the drafts of C23.
+ */
 #if (defined(__cplusplus) && __cplusplus > 202302L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
+     && ((defined(__clang__) && __clang_major__ >= 16) \
+         || (!defined(__clang__) && __GNUC__ >= 13)))
 /* The builtin of C23 diagnoses unexpected arguments, as C23 recommends. */
 #  if __has_builtin(__builtin_c23_va_start)
 #    define va_start(...) __builtin_c23_va_start(__VA_ARGS__)
@@ -51,7 +57,10 @@ typedef __builtin_va_list va_list;
 #endif
 
 #if (defined(__cplusplus) && __cplusplus > 202302L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
+     && ((defined(__clang__) && __clang_major__ >= 16) \
+         || (!defined(__clang__) && __GNUC__ >= 13)))
 #  define __STDC_VERSION_STDARG_H__ 202311L
 #endif
 

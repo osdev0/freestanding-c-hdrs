@@ -23,7 +23,13 @@ typedef __PTRDIFF_TYPE__ ptrdiff_t;
 #ifndef __cplusplus
 typedef __WCHAR_TYPE__ wchar_t;
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+/* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
+ * reports 202000L, the value they give the drafts of C23.
+ */
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
+     && ((defined(__clang__) && __clang_major__ >= 16) \
+         || (!defined(__clang__) && __GNUC__ >= 13)))
 typedef typeof(nullptr) nullptr_t;
 #endif
 
@@ -62,13 +68,19 @@ typedef struct {
 #undef offsetof
 #define offsetof(s, m) __builtin_offsetof(s, m)
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
+     && ((defined(__clang__) && __clang_major__ >= 16) \
+         || (!defined(__clang__) && __GNUC__ >= 13)))
 #  undef unreachable
 #  define unreachable() __builtin_unreachable()
 #endif
 
 #if (defined(__cplusplus) && __cplusplus > 202302L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
+     && ((defined(__clang__) && __clang_major__ >= 16) \
+         || (!defined(__clang__) && __GNUC__ >= 13)))
 #  define __STDC_VERSION_STDDEF_H__ 202311L
 #endif
 
