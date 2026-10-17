@@ -80,7 +80,8 @@
 #undef ULONG_MAX
 #define ULONG_MAX (LONG_MAX * 2UL + 1UL)
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if (defined(__cplusplus) && __cplusplus >= 201103L) \
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
 
 #undef LLONG_MAX
 #define LLONG_MAX __LONG_LONG_MAX__
@@ -92,7 +93,8 @@
 
 #endif
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+#if (defined(__cplusplus) && __cplusplus > 202302L) \
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
 
 #if defined(__clang__)
 #   undef CHAR_WIDTH
@@ -138,7 +140,8 @@
 #undef BOOL_WIDTH
 #define BOOL_WIDTH 1
 
-#ifdef __BITINT_MAXWIDTH__
+/* C++26 does not take this one from C23. */
+#if !defined(__cplusplus) && defined(__BITINT_MAXWIDTH__)
 #   undef BITINT_MAXWIDTH
 #   define BITINT_MAXWIDTH __BITINT_MAXWIDTH__
 #endif

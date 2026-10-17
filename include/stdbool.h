@@ -17,9 +17,14 @@
 #ifndef __FREESTANDING_C_HDRS_STDBOOL_H
 #define __FREESTANDING_C_HDRS_STDBOOL_H 1
 
+#if (defined(__cplusplus) && __cplusplus < 201103L) \
+ || (!defined(__cplusplus) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L))
+#  error "<stdbool.h> requires C99 or C++11 or later"
+#endif
+
 #ifndef __cplusplus
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+#if __STDC_VERSION__ >= 202311L
     /* These do not need to be defined for C23+ */
 #else
 #  undef bool

@@ -20,8 +20,24 @@
 typedef __builtin_va_list va_list;
 
 #undef va_start
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
-#  define va_start(v, ...) __builtin_va_start(v, 0)
+#if (defined(__cplusplus) && __cplusplus > 202302L) \
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
+/* The builtin of C23 diagnoses unexpected arguments, as C23 recommends. */
+#  if __has_builtin(__builtin_c23_va_start)
+#    define va_start(...) __builtin_c23_va_start(__VA_ARGS__)
+#  elif defined(__clang__) && defined(__cplusplus)
+/* Workaround: Clang 17 up to at least 23, all targets: it has the builtin of
+ * C23 only for C, and its -Wvarargs warns, in the code of the program, that
+ * the 0 passed in its stead is not the last named parameter.
+ */
+#    define va_start(v, ...) \
+         _Pragma("clang diagnostic push") \
+         _Pragma("clang diagnostic ignored \"-Wvarargs\"") \
+         __builtin_va_start(v, 0) \
+         _Pragma("clang diagnostic pop")
+#  else
+#    define va_start(v, ...) __builtin_va_start(v, 0)
+#  endif
 #else
 #  define va_start(v, l) __builtin_va_start(v, l)
 #endif
@@ -34,7 +50,8 @@ typedef __builtin_va_list va_list;
 #  define va_copy(d, s) __builtin_va_copy(d, s)
 #endif
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+#if (defined(__cplusplus) && __cplusplus > 202302L) \
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
 #  define __STDC_VERSION_STDARG_H__ 202311L
 #endif
 

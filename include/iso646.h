@@ -19,6 +19,10 @@
 
 #ifndef __cplusplus
 
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199409L
+#  error "<iso646.h> requires C95 or later"
+#endif
+
 #undef and
 #define and &&
 #undef and_eq

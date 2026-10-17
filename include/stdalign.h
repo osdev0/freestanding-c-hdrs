@@ -17,9 +17,25 @@
 #ifndef __FREESTANDING_C_HDRS_STDALIGN_H
 #define __FREESTANDING_C_HDRS_STDALIGN_H 1
 
+#if (defined(__cplusplus) && __cplusplus < 201103L) \
+ || (!defined(__cplusplus) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112L))
+#  error "<stdalign.h> requires C11 or C++11 or later"
+#endif
+
+/* C++11 to C++23 have __alignas_is_defined, and C++26, as C23, none. */
+#if defined(__cplusplus) && __cplusplus <= 202302L
+#  undef __alignas_is_defined
+#  define __alignas_is_defined 1
+#endif
+/* C++17 to C++23 also have __alignof_is_defined (LWG 4036). */
+#if defined(__cplusplus) && __cplusplus > 201402L && __cplusplus <= 202302L
+#  undef __alignof_is_defined
+#  define __alignof_is_defined 1
+#endif
+
 #ifndef __cplusplus
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+#if __STDC_VERSION__ >= 202311L
     /* These do not need to be defined for C23+ */
 #else
 #  undef alignas

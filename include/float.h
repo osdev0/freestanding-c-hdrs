@@ -97,15 +97,16 @@
 #undef LDBL_MIN
 #define LDBL_MIN __LDBL_MIN__
 
-#if (defined(__cplusplus) && __cplusplus >= 201703L) \
+#if (defined(__cplusplus) && __cplusplus > 201402L) \
  || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L)
 
 #undef FLT_DECIMAL_DIG
 #define FLT_DECIMAL_DIG __FLT_DECIMAL_DIG__
 #undef DBL_DECIMAL_DIG
 #define DBL_DECIMAL_DIG __DBL_DECIMAL_DIG__
+/* GCC before 7 lacks __LDBL_DECIMAL_DIG__, but __DECIMAL_DIG__ is the same. */
 #undef LDBL_DECIMAL_DIG
-#define LDBL_DECIMAL_DIG __LDBL_DECIMAL_DIG__
+#define LDBL_DECIMAL_DIG __DECIMAL_DIG__
 
 #undef FLT_TRUE_MIN
 #define FLT_TRUE_MIN __FLT_DENORM_MIN__
@@ -120,6 +121,79 @@
 #define DBL_HAS_SUBNORM __DBL_HAS_DENORM__
 #undef LDBL_HAS_SUBNORM
 #define LDBL_HAS_SUBNORM __LDBL_HAS_DENORM__
+
+#endif
+
+#if (defined(__cplusplus) && __cplusplus > 202302L) \
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
+
+#define __STDC_VERSION_FLOAT_H__ 202311L
+
+/* GCC defines the __*_HAS_* macros as 0 where the format lacks the values. */
+#if __FLT_HAS_INFINITY__
+#  undef INFINITY
+#  define INFINITY (__builtin_inff())
+#endif
+
+/* The types with quiet NaNs have signaling ones too. */
+#if __FLT_HAS_QUIET_NAN__
+#  undef NAN
+#  define NAN (__builtin_nanf(""))
+#  undef FLT_SNAN
+#  define FLT_SNAN (__builtin_nansf(""))
+#endif
+#if __DBL_HAS_QUIET_NAN__
+#  undef DBL_SNAN
+#  define DBL_SNAN (__builtin_nans(""))
+#endif
+#if __LDBL_HAS_QUIET_NAN__
+#  undef LDBL_SNAN
+#  define LDBL_SNAN (__builtin_nansl(""))
+#endif
+
+/* Workaround: Clang up to at least 23, all targets: it does not tell whether
+ * the types have the radix, precision and exponent range of an ISO/IEC 60559
+ * format. Of its formats, binary16, binary32, binary64, binary128 and the
+ * binary64-extended format of x87 do, with the parameters of C23 Annex H.
+ */
+#undef FLT_IS_IEC_60559
+#undef DBL_IS_IEC_60559
+#undef LDBL_IS_IEC_60559
+#ifdef __FLT_IS_IEC_60559__
+#  define FLT_IS_IEC_60559 __FLT_IS_IEC_60559__
+#  define DBL_IS_IEC_60559 __DBL_IS_IEC_60559__
+#  define LDBL_IS_IEC_60559 __LDBL_IS_IEC_60559__
+#else
+#  define __FREESTANDING_C_HDRS_IS_IEC_60559(p, emin, emax) \
+       (__FLT_RADIX__ == 2 && (emin) == 3 - (emax) \
+           && (((p) == 11 && (emax) == 16) || ((p) == 24 && (emax) == 128) \
+               || ((p) == 53 && (emax) == 1024) || ((p) == 64 && (emax) == 16384) \
+               || ((p) == 113 && (emax) == 16384)))
+#  define FLT_IS_IEC_60559 __FREESTANDING_C_HDRS_IS_IEC_60559(__FLT_MANT_DIG__, __FLT_MIN_EXP__, __FLT_MAX_EXP__)
+#  define DBL_IS_IEC_60559 __FREESTANDING_C_HDRS_IS_IEC_60559(__DBL_MANT_DIG__, __DBL_MIN_EXP__, __DBL_MAX_EXP__)
+#  define LDBL_IS_IEC_60559 __FREESTANDING_C_HDRS_IS_IEC_60559(__LDBL_MANT_DIG__, __LDBL_MIN_EXP__, __LDBL_MAX_EXP__)
+#endif
+
+/* Workaround: Clang 17 and 18, all targets: they do not tell the largest
+ * normalized numbers. Those are the largest finite numbers, except for the
+ * double-double long double of PowerPC, where it is (1 - 2^-106) * 2^1023.
+ */
+#undef FLT_NORM_MAX
+#undef DBL_NORM_MAX
+#undef LDBL_NORM_MAX
+#ifdef __FLT_NORM_MAX__
+#  define FLT_NORM_MAX __FLT_NORM_MAX__
+#  define DBL_NORM_MAX __DBL_NORM_MAX__
+#  define LDBL_NORM_MAX __LDBL_NORM_MAX__
+#else
+#  define FLT_NORM_MAX __FLT_MAX__
+#  define DBL_NORM_MAX __DBL_MAX__
+#  if __LDBL_MANT_DIG__ == 106
+#    define LDBL_NORM_MAX 0x1.ffffffffffffffffffffffffff8p+1022L
+#  else
+#    define LDBL_NORM_MAX __LDBL_MAX__
+#  endif
+#endif
 
 #endif
 

@@ -17,6 +17,11 @@
 #ifndef __FREESTANDING_C_HDRS_STDINT_H
 #define __FREESTANDING_C_HDRS_STDINT_H 1
 
+#if (defined(__cplusplus) && __cplusplus < 201103L) \
+ || (!defined(__cplusplus) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L))
+#  error "<stdint.h> requires C99 or C++11 or later"
+#endif
+
 #ifdef __UINT8_TYPE__
 typedef __UINT8_TYPE__ uint8_t;
 #endif
@@ -258,22 +263,55 @@ typedef __INTMAX_TYPE__ intmax_t;
 #undef SIG_ATOMIC_MAX
 #define SIG_ATOMIC_MAX __SIG_ATOMIC_MAX__
 #undef SIG_ATOMIC_MIN
-#define SIG_ATOMIC_MIN (-SIG_ATOMIC_MAX - 1)
+#ifdef __SIG_ATOMIC_MIN__
+#   define SIG_ATOMIC_MIN __SIG_ATOMIC_MIN__
+#else
+#   define SIG_ATOMIC_MIN (-SIG_ATOMIC_MAX - 1)
+#endif
 
 #undef SIZE_MAX
 #define SIZE_MAX __SIZE_MAX__
 
+/* The minimums of the unsigned types are 0 of their promoted types. GCC and
+ * Clang 23 and later tell the minimums, and earlier Clang whether wchar_t
+ * and wint_t are unsigned. In C++, wchar_t is a type of its own, which where
+ * it is as wide as int promotes to int or unsigned int, even where GCC makes
+ * it long in C, as on i386 and 32-bit PowerPC.
+ */
 #undef WCHAR_MAX
-#define WCHAR_MAX __WCHAR_MAX__
 #undef WCHAR_MIN
-#define WCHAR_MIN (-WCHAR_MAX - 1)
+#if defined(__cplusplus) && __SIZEOF_WCHAR_T__ == __SIZEOF_INT__
+#   ifdef __WCHAR_UNSIGNED__
+#       define WCHAR_MAX (__INT_MAX__ * 2U + 1U)
+#       define WCHAR_MIN 0U
+#   else
+#       define WCHAR_MAX __INT_MAX__
+#       define WCHAR_MIN (-__INT_MAX__ - 1)
+#   endif
+#else
+#   define WCHAR_MAX __WCHAR_MAX__
+#   if defined(__WCHAR_MIN__)
+#       define WCHAR_MIN __WCHAR_MIN__
+#   elif defined(__WCHAR_UNSIGNED__)
+#       define WCHAR_MIN (WCHAR_MAX - WCHAR_MAX)
+#   else
+#       define WCHAR_MIN (-WCHAR_MAX - 1)
+#   endif
+#endif
 
 #undef WINT_MAX
 #define WINT_MAX __WINT_MAX__
 #undef WINT_MIN
-#define WINT_MIN (-WINT_MAX - 1)
+#if defined(__WINT_MIN__)
+#   define WINT_MIN __WINT_MIN__
+#elif defined(__WINT_UNSIGNED__)
+#   define WINT_MIN (WINT_MAX - WINT_MAX)
+#else
+#   define WINT_MIN (-WINT_MAX - 1)
+#endif
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+#if (defined(__cplusplus) && __cplusplus > 202302L) \
+ || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
 
 #ifdef __INT8_TYPE__
 #   undef INT8_WIDTH

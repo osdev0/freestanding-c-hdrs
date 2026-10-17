@@ -17,10 +17,12 @@
 #ifndef __FREESTANDING_C_HDRS_STDNORETURN_H
 #define __FREESTANDING_C_HDRS_STDNORETURN_H 1
 
-#ifndef __cplusplus
+#if defined(__cplusplus)
+#  error "<stdnoreturn.h> is not a header of C++"
+#elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112L
+#  error "<stdnoreturn.h> requires C11 or later"
+#endif
 
 #define noreturn _Noreturn
-
-#endif
 
 #endif
