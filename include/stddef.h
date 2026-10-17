@@ -31,7 +31,17 @@ typedef __WCHAR_TYPE__ wchar_t;
  || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
      && ((defined(__clang__) && __clang_major__ >= 16) \
          || (!defined(__clang__) && __GNUC__ >= 13)))
+/* Workaround: GCC 13 to 14, all targets: it declares nullptr_t itself, and
+ * its -Wshadow warns that this declaration shadows that one.
+ */
+#  if !defined(__clang__) && __GNUC__ < 15
+_Pragma("GCC diagnostic push")
+_Pragma("GCC diagnostic ignored \"-Wshadow\"")
+#  endif
 typedef typeof(nullptr) nullptr_t;
+#  if !defined(__clang__) && __GNUC__ < 15
+_Pragma("GCC diagnostic pop")
+#  endif
 #endif
 
 #endif
