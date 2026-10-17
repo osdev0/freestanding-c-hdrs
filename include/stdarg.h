@@ -26,9 +26,9 @@ typedef __builtin_va_list va_list;
 #  if __has_builtin(__builtin_c23_va_start)
 #    define va_start(...) __builtin_c23_va_start(__VA_ARGS__)
 #  elif defined(__clang__) && defined(__cplusplus)
-/* Workaround: Clang 17 up to at least 23, all targets: it has the builtin of
- * C23 only for C, and its -Wvarargs warns, in the code of the program, that
- * the 0 passed in its stead is not the last named parameter.
+/* Workaround: Clang 17 up to at least 23, all targets: it has no builtin of
+ * C23 for C++, and its -Wvarargs warns, in the code of the program, that the
+ * 0 passed in its stead is not the last named parameter.
  */
 #    define va_start(v, ...) \
          _Pragma("clang diagnostic push") \

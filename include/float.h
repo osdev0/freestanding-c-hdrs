@@ -135,7 +135,7 @@
 #  define INFINITY (__builtin_inff())
 #endif
 
-/* The types with quiet NaNs have signaling ones too. */
+/* The types with quiet NaNs have signalling ones too. */
 #if __FLT_HAS_QUIET_NAN__
 #  undef NAN
 #  define NAN (__builtin_nanf(""))
@@ -152,8 +152,8 @@
 #endif
 
 /* Workaround: Clang up to at least 23, all targets: it does not tell whether
- * the types have the radix, precision and exponent range of an ISO/IEC 60559
- * format. Of its formats, binary16, binary32, binary64, binary128 and the
+ * the types have the radix, precision, and exponent range of an ISO/IEC 60559
+ * format. Of its formats, binary16, binary32, binary64, binary128, and the
  * binary64-extended format of x87 do, with the parameters of C23 Annex H.
  */
 #undef FLT_IS_IEC_60559
@@ -174,8 +174,8 @@
 #  define LDBL_IS_IEC_60559 __FREESTANDING_C_HDRS_IS_IEC_60559(__LDBL_MANT_DIG__, __LDBL_MIN_EXP__, __LDBL_MAX_EXP__)
 #endif
 
-/* Workaround: Clang 17 and 18, all targets: they do not tell the largest
- * normalized numbers. Those are the largest finite numbers, except for the
+/* Workaround: Clang 17 to 18, all targets: it does not tell the largest
+ * normalised numbers. Those are the largest finite numbers, except for the
  * double-double long double of PowerPC, where it is (1 - 2^-106) * 2^1023.
  */
 #undef FLT_NORM_MAX

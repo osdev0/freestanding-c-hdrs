@@ -36,7 +36,7 @@
 #ifndef __cplusplus
 
 #if __STDC_VERSION__ >= 202311L
-    /* These do not need to be defined for C23+ */
+    /* These do not need to be defined for C23+. */
 #else
 #  undef alignas
 #  define alignas _Alignas
