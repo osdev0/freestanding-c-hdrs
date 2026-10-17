@@ -22,17 +22,6 @@
 #  error "<stdalign.h> requires C11 or C++11 or later"
 #endif
 
-/* C++11 to C++23 have __alignas_is_defined, and C++26, as C23, none. */
-#if defined(__cplusplus) && __cplusplus <= 202302L
-#  undef __alignas_is_defined
-#  define __alignas_is_defined 1
-#endif
-/* C++17 to C++23 also have __alignof_is_defined (LWG 4036). */
-#if defined(__cplusplus) && __cplusplus > 201402L && __cplusplus <= 202302L
-#  undef __alignof_is_defined
-#  define __alignof_is_defined 1
-#endif
-
 #ifndef __cplusplus
 
 /* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
@@ -48,13 +37,24 @@
 #  define alignas _Alignas
 #  undef alignof
 #  define alignof _Alignof
+#endif
 
-#  undef __alignof_is_defined
-#  define __alignof_is_defined 1
+#endif
+
+/* C11 to C17, where alignas is the macro above, and C++11 to C++23 have
+ * __alignas_is_defined, and C23 and C++26 none.
+ */
+#if defined(alignas) || (defined(__cplusplus) && __cplusplus <= 202302L)
 #  undef __alignas_is_defined
 #  define __alignas_is_defined 1
 #endif
-
+/* C11 to C17, where alignof is the macro above, and C++17 to C++23 (LWG 4036)
+ * also have __alignof_is_defined.
+ */
+#if defined(alignof) \
+ || (defined(__cplusplus) && __cplusplus > 201402L && __cplusplus <= 202302L)
+#  undef __alignof_is_defined
+#  define __alignof_is_defined 1
 #endif
 
 #endif
