@@ -17,6 +17,8 @@
 #ifndef __FREESTANDING_C_HDRS_STDDEF_H
 #define __FREESTANDING_C_HDRS_STDDEF_H 1
 
+#pragma GCC system_header
+
 /* On LLP64 targets these are long long, which C90 and C++98 do not have. */
 __extension__ typedef __SIZE_TYPE__ size_t;
 __extension__ typedef __PTRDIFF_TYPE__ ptrdiff_t;

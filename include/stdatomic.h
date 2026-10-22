@@ -17,6 +17,8 @@
 #ifndef __FREESTANDING_C_HDRS_STDATOMIC_H
 #define __FREESTANDING_C_HDRS_STDATOMIC_H 1
 
+#pragma GCC system_header
+
 #if (defined(__cplusplus) && __cplusplus <= 202002L) \
  || (!defined(__cplusplus) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112L))
 #  error "<stdatomic.h> requires C11 or C++23 or later"

@@ -17,6 +17,8 @@
 #ifndef __FREESTANDING_C_HDRS_STDCKDINT_H
 #define __FREESTANDING_C_HDRS_STDCKDINT_H 1
 
+#pragma GCC system_header
+
 /* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
  * reports 202000L, the value they give the drafts of C23.
  */

@@ -17,6 +17,8 @@
 #ifndef __FREESTANDING_C_HDRS_STDALIGN_H
 #define __FREESTANDING_C_HDRS_STDALIGN_H 1
 
+#pragma GCC system_header
+
 #if (defined(__cplusplus) && __cplusplus < 201103L) \
  || (!defined(__cplusplus) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112L))
 #  error "<stdalign.h> requires C11 or C++11 or later"

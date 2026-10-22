@@ -17,6 +17,8 @@
 #ifndef __FREESTANDING_C_HDRS_FLOAT_H
 #define __FREESTANDING_C_HDRS_FLOAT_H 1
 
+#pragma GCC system_header
+
 #undef FLT_ROUNDS
 #define FLT_ROUNDS 1
 

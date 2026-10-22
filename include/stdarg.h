@@ -17,6 +17,8 @@
 #ifndef __FREESTANDING_C_HDRS_STDARG_H
 #define __FREESTANDING_C_HDRS_STDARG_H 1
 
+#pragma GCC system_header
+
 typedef __builtin_va_list va_list;
 
 #undef va_start

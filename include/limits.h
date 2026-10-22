@@ -17,6 +17,8 @@
 #ifndef __FREESTANDING_C_HDRS_LIMITS_H
 #define __FREESTANDING_C_HDRS_LIMITS_H 1
 
+#pragma GCC system_header
+
 #undef CHAR_BIT
 #define CHAR_BIT __CHAR_BIT__
 

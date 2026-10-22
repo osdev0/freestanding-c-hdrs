@@ -17,6 +17,8 @@
 #ifndef __FREESTANDING_C_HDRS_STDNORETURN_H
 #define __FREESTANDING_C_HDRS_STDNORETURN_H 1
 
+#pragma GCC system_header
+
 #if defined(__cplusplus)
 #  error "<stdnoreturn.h> is not a header of C++"
 #elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112L

@@ -17,6 +17,8 @@
 #ifndef __FREESTANDING_C_HDRS_ISO646_H
 #define __FREESTANDING_C_HDRS_ISO646_H 1
 
+#pragma GCC system_header
+
 #ifndef __cplusplus
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199409L
