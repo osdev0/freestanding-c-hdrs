@@ -262,14 +262,10 @@ typedef __INTMAX_TYPE__ intmax_t;
 #undef PTRDIFF_MIN
 #define PTRDIFF_MIN (-PTRDIFF_MAX - 1)
 
-#undef SIG_ATOMIC_MAX
-#define SIG_ATOMIC_MAX __SIG_ATOMIC_MAX__
-#undef SIG_ATOMIC_MIN
-#ifdef __SIG_ATOMIC_MIN__
-#   define SIG_ATOMIC_MIN __SIG_ATOMIC_MIN__
-#else
-#   define SIG_ATOMIC_MIN (-SIG_ATOMIC_MAX - 1)
-#endif
+/* SIG_ATOMIC_MIN, SIG_ATOMIC_MAX and SIG_ATOMIC_WIDTH are left out. They are
+ * the limits of sig_atomic_t, which <signal.h> declares for the objects that
+ * signal handlers use, and only a hosted environment has signals.
+ */
 
 #undef SIZE_MAX
 #define SIZE_MAX __SIZE_MAX__
@@ -404,9 +400,6 @@ typedef __INTMAX_TYPE__ intmax_t;
 
 #undef PTRDIFF_WIDTH
 #define PTRDIFF_WIDTH __PTRDIFF_WIDTH__
-
-#undef SIG_ATOMIC_WIDTH
-#define SIG_ATOMIC_WIDTH __SIG_ATOMIC_WIDTH__
 
 #undef SIZE_WIDTH
 #define SIZE_WIDTH __SIZE_WIDTH__
