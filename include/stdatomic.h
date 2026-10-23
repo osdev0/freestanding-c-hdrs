@@ -22,6 +22,12 @@
 #if (defined(__cplusplus) && __cplusplus <= 202002L) \
  || (!defined(__cplusplus) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112L))
 #  error "<stdatomic.h> requires C11 or C++23 or later"
+/* GCC before 4.9 has no _Atomic, which it does not tell with
+ * __STDC_NO_ATOMICS__ either.
+ */
+#elif !defined(__cplusplus) && !defined(__clang__) && __GNUC__ == 4 \
+ && __GNUC_MINOR__ < 9
+#  error "<stdatomic.h> requires a compiler with _Atomic"
 #elif !defined(__cplusplus)
 
 /* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
