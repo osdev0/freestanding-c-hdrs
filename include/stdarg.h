@@ -43,6 +43,14 @@ typedef __builtin_va_list va_list;
          _Pragma("clang diagnostic ignored \"-Wvarargs\"") \
          __builtin_va_start(v, 0) \
          _Pragma("clang diagnostic pop")
+#  elif defined(__clang__) && __clang_major__ < 19
+/* Workaround: Clang 16 to 18, all targets: -Wpedantic warns, in the code of
+ * the program, that va_start(ap) leaves out the variadic arguments, so they
+ * go to another macro, with one more, which expands the macros of any
+ * further arguments, which C23 leaves alone.
+ */
+#    define va_start(...) __FREESTANDING_C_HDRS_VA_START(__VA_ARGS__, 0)
+#    define __FREESTANDING_C_HDRS_VA_START(v, ...) __builtin_va_start(v, 0)
 #  else
 #    define va_start(v, ...) __builtin_va_start(v, 0)
 #  endif
