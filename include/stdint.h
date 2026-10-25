@@ -19,8 +19,9 @@
 
 #pragma GCC system_header
 
-#if (defined(__cplusplus) && __cplusplus < 201103L) \
- || (!defined(__cplusplus) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L))
+#include <__freestanding_c_hdrs/revision.h>
+
+#if __FREESTANDING_C_HDRS_STDINT_REVISION < 199901L
 #  error "<stdint.h> requires C99 or C++11 or later"
 #endif
 
@@ -272,29 +273,17 @@ typedef __INTMAX_TYPE__ intmax_t;
 
 /* The minimums of the unsigned types are 0 of their promoted types. GCC and
  * Clang 23 and later tell the minimums, and earlier Clang whether wchar_t
- * and wint_t are unsigned. In C++, wchar_t is a type of its own, which where
- * it is as wide as int promotes to int or unsigned int, even where GCC makes
- * it long in C, as on i386 and 32-bit PowerPC.
+ * and wint_t are unsigned.
  */
 #undef WCHAR_MAX
+#define WCHAR_MAX __WCHAR_MAX__
 #undef WCHAR_MIN
-#if defined(__cplusplus) && __SIZEOF_WCHAR_T__ == __SIZEOF_INT__
-#   ifdef __WCHAR_UNSIGNED__
-#       define WCHAR_MAX (__INT_MAX__ * 2U + 1U)
-#       define WCHAR_MIN 0U
-#   else
-#       define WCHAR_MAX __INT_MAX__
-#       define WCHAR_MIN (-__INT_MAX__ - 1)
-#   endif
+#if defined(__WCHAR_MIN__)
+#   define WCHAR_MIN __WCHAR_MIN__
+#elif defined(__WCHAR_UNSIGNED__)
+#   define WCHAR_MIN (WCHAR_MAX - WCHAR_MAX)
 #else
-#   define WCHAR_MAX __WCHAR_MAX__
-#   if defined(__WCHAR_MIN__)
-#       define WCHAR_MIN __WCHAR_MIN__
-#   elif defined(__WCHAR_UNSIGNED__)
-#       define WCHAR_MIN (WCHAR_MAX - WCHAR_MAX)
-#   else
-#       define WCHAR_MIN (-WCHAR_MAX - 1)
-#   endif
+#   define WCHAR_MIN (-WCHAR_MAX - 1)
 #endif
 
 #undef WINT_MAX
@@ -308,14 +297,7 @@ typedef __INTMAX_TYPE__ intmax_t;
 #   define WINT_MIN (-WINT_MAX - 1)
 #endif
 
-/* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
- * reports 202000L, the value they give the drafts of C23.
- */
-#if (defined(__cplusplus) && __cplusplus > 202302L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
-     && ((defined(__clang__) && __clang_major__ >= 16) \
-         || (!defined(__clang__) && __GNUC__ >= 13)))
+#if __FREESTANDING_C_HDRS_STDINT_REVISION >= 202311L
 
 #ifdef __INT8_TYPE__
 #   undef INT8_WIDTH
@@ -411,6 +393,10 @@ typedef __INTMAX_TYPE__ intmax_t;
 #define WINT_WIDTH __WINT_WIDTH__
 
 #define __STDC_VERSION_STDINT_H__ 202311L
+#endif
+
+#ifdef __cplusplus
+#   include <__fcxx/c_stdint.h>
 #endif
 
 #endif

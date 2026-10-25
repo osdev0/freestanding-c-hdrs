@@ -19,44 +19,26 @@
 
 #pragma GCC system_header
 
-#if (defined(__cplusplus) && __cplusplus < 201103L) \
- || (!defined(__cplusplus) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112L))
+#include <__freestanding_c_hdrs/revision.h>
+
+#if __FREESTANDING_C_HDRS_STDALIGN_REVISION < 201112L
 #  error "<stdalign.h> requires C11 or C++11 or later"
-#endif
-
-#ifndef __cplusplus
-
-/* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
- * reports 202000L, the value they give the drafts of C23.
- */
-#if __STDC_VERSION__ >= 202311L \
- || (__STDC_VERSION__ > 201710L \
-     && ((defined(__clang__) && __clang_major__ >= 16) \
-         || (!defined(__clang__) && __GNUC__ >= 13)))
+#elif __FREESTANDING_C_HDRS_STDALIGN_REVISION >= 202311L
     /* These do not need to be defined for C23+. */
 #else
 #  undef alignas
 #  define alignas _Alignas
 #  undef alignof
 #  define alignof _Alignof
-#endif
 
-#endif
-
-/* C11 to C17, where alignas is the macro above, and C++11 to C++23 have
- * __alignas_is_defined, and C23 and C++26 none.
- */
-#if defined(alignas) || (defined(__cplusplus) && __cplusplus <= 202302L)
 #  undef __alignas_is_defined
 #  define __alignas_is_defined 1
-#endif
-/* C11 to C17, where alignof is the macro above, and C++17 to C++23 (LWG 4036)
- * also have __alignof_is_defined.
- */
-#if defined(alignof) \
- || (defined(__cplusplus) && __cplusplus > 201402L && __cplusplus <= 202302L)
 #  undef __alignof_is_defined
 #  define __alignof_is_defined 1
+#endif
+
+#ifdef __cplusplus
+#  include <__fcxx/c_stdalign.h>
 #endif
 
 #endif

@@ -19,6 +19,8 @@
 
 #pragma GCC system_header
 
+#include <__freestanding_c_hdrs/revision.h>
+
 /* On LLP64 targets these are long long, which C90 and C++98 do not have. */
 __extension__ typedef __SIZE_TYPE__ size_t;
 __extension__ typedef __PTRDIFF_TYPE__ ptrdiff_t;
@@ -26,13 +28,7 @@ __extension__ typedef __PTRDIFF_TYPE__ ptrdiff_t;
 #ifndef __cplusplus
 typedef __WCHAR_TYPE__ wchar_t;
 
-/* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
- * reports 202000L, the value they give the drafts of C23.
- */
-#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
-     && ((defined(__clang__) && __clang_major__ >= 16) \
-         || (!defined(__clang__) && __GNUC__ >= 13)))
+#if __FREESTANDING_C_HDRS_STDDEF_REVISION >= 202311L
 /* Workaround: GCC 13 to 14, all targets: it declares nullptr_t itself, and
  * its -Wshadow warns that this declaration shadows that one.
  */
@@ -48,16 +44,11 @@ _Pragma("GCC diagnostic pop")
 
 #endif
 
-#if defined(__cplusplus) && __cplusplus >= 201103L
-typedef decltype(nullptr) nullptr_t;
-#endif
-
 /* As in the stddef.h of GCC and Clang, max_align_t is as aligned as the most
  * aligned scalar type, including __float128 on i386 for GCC 7 and later,
  * except that Clang makes it long double for Apple targets.
  */
-#if (defined(__cplusplus) && __cplusplus >= 201103L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L)
+#if __FREESTANDING_C_HDRS_STDDEF_REVISION >= 201112L
 #if defined(__clang__) && defined(__APPLE__)
 typedef long double max_align_t;
 #else
@@ -72,29 +63,23 @@ typedef struct {
 #endif
 
 #undef NULL
-#ifndef __cplusplus
-#  define NULL ((void *)0)
-#else
-#  define NULL __null
-#endif
+#define NULL ((void *)0)
 
 #undef offsetof
 #define offsetof(s, m) __builtin_offsetof(s, m)
 
-#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
-     && ((defined(__clang__) && __clang_major__ >= 16) \
-         || (!defined(__clang__) && __GNUC__ >= 13)))
+/* C++26 does not take this one from C23. */
+#if !defined(__cplusplus) && __FREESTANDING_C_HDRS_STDDEF_REVISION >= 202311L
 #  undef unreachable
 #  define unreachable() __builtin_unreachable()
 #endif
 
-#if (defined(__cplusplus) && __cplusplus > 202302L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
-     && ((defined(__clang__) && __clang_major__ >= 16) \
-         || (!defined(__clang__) && __GNUC__ >= 13)))
+#if __FREESTANDING_C_HDRS_STDDEF_REVISION >= 202311L
 #  define __STDC_VERSION_STDDEF_H__ 202311L
+#endif
+
+#ifdef __cplusplus
+#  include <__fcxx/c_stddef.h>
 #endif
 
 #endif

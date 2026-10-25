@@ -19,14 +19,9 @@
 
 #pragma GCC system_header
 
-/* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
- * reports 202000L, the value they give the drafts of C23.
- */
-#if !((defined(__cplusplus) && __cplusplus > 202302L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
-     && ((defined(__clang__) && __clang_major__ >= 16) \
-         || (!defined(__clang__) && __GNUC__ >= 13))))
+#include <__freestanding_c_hdrs/revision.h>
+
+#if __FREESTANDING_C_HDRS_STDBIT_REVISION < 202311L
 #  error "<stdbit.h> requires C23 or C++26 or later"
 #else
 
@@ -78,6 +73,8 @@ typedef __INT_LEAST16_TYPE__ int_least16_t;
 typedef __INT_LEAST32_TYPE__ int_least32_t;
 typedef __INT_LEAST64_TYPE__ int_least64_t;
 
+#ifndef __cplusplus
+
 /* What the operations are made of, for x, an object of an unsigned integer
  * type, which they read more than once: its width, and the numbers of its
  * leading and of its trailing zero bits, which are z where x is 0, and of its
@@ -127,12 +124,6 @@ typedef __INT_LEAST64_TYPE__ int_least64_t;
            ? __builtin_popcountll(__FREESTANDING_C_HDRS_STDBIT_HIGH(x)) : 0))
 #endif
 
-#ifndef __cplusplus
-#  define __FREESTANDING_C_HDRS_STDBIT_BOOL _Bool
-#else
-#  define __FREESTANDING_C_HDRS_STDBIT_BOOL bool
-#endif
-
 /* The operations, on such an x, with results of the types of those of the
  * functions: the first bits are at their index plus 1, or at 0 where there is
  * none, and the ceiling is 0 where it cannot be represented, which a shift of
@@ -169,7 +160,7 @@ typedef __INT_LEAST64_TYPE__ int_least64_t;
 #define __FREESTANDING_C_HDRS_STDBIT_OP_count_ones(x) \
     ((unsigned int)__FREESTANDING_C_HDRS_STDBIT_POPCOUNT(x))
 #define __FREESTANDING_C_HDRS_STDBIT_OP_has_single_bit(x) \
-    ((__FREESTANDING_C_HDRS_STDBIT_BOOL)((x) != 0 && ((x) & ((x) - 1)) == 0))
+    ((_Bool)((x) != 0 && ((x) & ((x) - 1)) == 0))
 #define __FREESTANDING_C_HDRS_STDBIT_OP_bit_width(x) \
     ((unsigned int)(__FREESTANDING_C_HDRS_STDBIT_WIDTH(x) \
                     - __FREESTANDING_C_HDRS_STDBIT_CLZ( \
@@ -187,42 +178,36 @@ typedef __INT_LEAST64_TYPE__ int_least64_t;
                                (__typeof__(x))((x) - 1), 0))))
 
 /* Each operation, F(name, its results for unsigned char, short, int, long
- * and long long, and that of the type-generic function in C++, where
- * __freestanding_c_hdrs_type is the type of its argument).
+ * and long long).
  */
 #define __FREESTANDING_C_HDRS_STDBIT_OPERATIONS(F) \
     F(leading_zeros, unsigned int, unsigned int, unsigned int, \
-      unsigned int, unsigned int, unsigned int) \
+      unsigned int, unsigned int) \
     F(leading_ones, unsigned int, unsigned int, unsigned int, \
-      unsigned int, unsigned int, unsigned int) \
+      unsigned int, unsigned int) \
     F(trailing_zeros, unsigned int, unsigned int, unsigned int, \
-      unsigned int, unsigned int, unsigned int) \
+      unsigned int, unsigned int) \
     F(trailing_ones, unsigned int, unsigned int, unsigned int, \
-      unsigned int, unsigned int, unsigned int) \
+      unsigned int, unsigned int) \
     F(first_leading_zero, unsigned int, unsigned int, unsigned int, \
-      unsigned int, unsigned int, unsigned int) \
+      unsigned int, unsigned int) \
     F(first_leading_one, unsigned int, unsigned int, unsigned int, \
-      unsigned int, unsigned int, unsigned int) \
+      unsigned int, unsigned int) \
     F(first_trailing_zero, unsigned int, unsigned int, unsigned int, \
-      unsigned int, unsigned int, unsigned int) \
+      unsigned int, unsigned int) \
     F(first_trailing_one, unsigned int, unsigned int, unsigned int, \
-      unsigned int, unsigned int, unsigned int) \
+      unsigned int, unsigned int) \
     F(count_zeros, unsigned int, unsigned int, unsigned int, \
-      unsigned int, unsigned int, unsigned int) \
+      unsigned int, unsigned int) \
     F(count_ones, unsigned int, unsigned int, unsigned int, \
-      unsigned int, unsigned int, unsigned int) \
-    F(has_single_bit, \
-      __FREESTANDING_C_HDRS_STDBIT_BOOL, __FREESTANDING_C_HDRS_STDBIT_BOOL, \
-      __FREESTANDING_C_HDRS_STDBIT_BOOL, __FREESTANDING_C_HDRS_STDBIT_BOOL, \
-      __FREESTANDING_C_HDRS_STDBIT_BOOL, __FREESTANDING_C_HDRS_STDBIT_BOOL) \
+      unsigned int, unsigned int) \
+    F(has_single_bit, _Bool, _Bool, _Bool, _Bool, _Bool) \
     F(bit_width, unsigned int, unsigned int, unsigned int, \
-      unsigned int, unsigned int, unsigned int) \
+      unsigned int, unsigned int) \
     F(bit_floor, unsigned char, unsigned short, unsigned int, unsigned long, \
-      unsigned long long, __freestanding_c_hdrs_type) \
+      unsigned long long) \
     F(bit_ceil, unsigned char, unsigned short, unsigned int, unsigned long, \
-      unsigned long long, __freestanding_c_hdrs_type)
-
-#ifndef __cplusplus
+      unsigned long long)
 
 #if defined(__has_c_attribute)
 #  if __has_c_attribute(__unsequenced__)
@@ -237,8 +222,7 @@ typedef __INT_LEAST64_TYPE__ int_least64_t;
  * their macros links with a library that defines them. The macros below
  * compute their results themselves, and need no library.
  */
-#define __FREESTANDING_C_HDRS_STDBIT_DECLARE(name, ruc, rus, rui, rul, rull, \
-                                             rgen) \
+#define __FREESTANDING_C_HDRS_STDBIT_DECLARE(name, ruc, rus, rui, rul, rull) \
     ruc stdc_##name##_uc(unsigned char) \
         __FREESTANDING_C_HDRS_STDBIT_UNSEQUENCED; \
     rus stdc_##name##_us(unsigned short) \
@@ -580,78 +564,13 @@ unsigned long long __freestanding_c_hdrs_stdbit_ull(unsigned long long);
 #define stdc_bit_ceil(value) \
     __FREESTANDING_C_HDRS_STDBIT_GENERIC(bit_ceil, value)
 
+#undef __FREESTANDING_C_HDRS_STDBIT_OPERATIONS
+
 #else
 
-#undef __cpp_lib_stdbit_h
-#define __cpp_lib_stdbit_h 202603L
-
-/* The function templates accept only these types: __is_same tells them apart
- * from their const and volatile versions.
- */
-template<class __freestanding_c_hdrs_type>
-inline constexpr bool __freestanding_c_hdrs_stdbit_type =
-    __is_same(__freestanding_c_hdrs_type, unsigned char)
-    || __is_same(__freestanding_c_hdrs_type, unsigned short)
-    || __is_same(__freestanding_c_hdrs_type, unsigned int)
-    || __is_same(__freestanding_c_hdrs_type, unsigned long)
-    || __is_same(__freestanding_c_hdrs_type, unsigned long long)
-#ifdef __SIZEOF_INT128__
-    || __extension__ __is_same(__freestanding_c_hdrs_type, unsigned __int128)
-#endif
-    ;
-
-/* The functions, and the function templates of the type-generic functions,
- * none of which are constexpr, as in C.
- */
-#define __FREESTANDING_C_HDRS_STDBIT_DEFINE(name, ruc, rus, rui, rul, rull, \
-                                            rgen) \
-    inline ruc stdc_##name##_uc( \
-        unsigned char __freestanding_c_hdrs_value) noexcept \
-    { \
-        return __FREESTANDING_C_HDRS_STDBIT_OP_##name( \
-            __freestanding_c_hdrs_value); \
-    } \
-    inline rus stdc_##name##_us( \
-        unsigned short __freestanding_c_hdrs_value) noexcept \
-    { \
-        return __FREESTANDING_C_HDRS_STDBIT_OP_##name( \
-            __freestanding_c_hdrs_value); \
-    } \
-    inline rui stdc_##name##_ui( \
-        unsigned int __freestanding_c_hdrs_value) noexcept \
-    { \
-        return __FREESTANDING_C_HDRS_STDBIT_OP_##name( \
-            __freestanding_c_hdrs_value); \
-    } \
-    inline rul stdc_##name##_ul( \
-        unsigned long __freestanding_c_hdrs_value) noexcept \
-    { \
-        return __FREESTANDING_C_HDRS_STDBIT_OP_##name( \
-            __freestanding_c_hdrs_value); \
-    } \
-    inline rull stdc_##name##_ull( \
-        unsigned long long __freestanding_c_hdrs_value) noexcept \
-    { \
-        return __FREESTANDING_C_HDRS_STDBIT_OP_##name( \
-            __freestanding_c_hdrs_value); \
-    } \
-    template<class __freestanding_c_hdrs_type> \
-    rgen stdc_##name(__freestanding_c_hdrs_type __freestanding_c_hdrs_value) \
-        noexcept \
-    { \
-        static_assert( \
-            __freestanding_c_hdrs_stdbit_type<__freestanding_c_hdrs_type>, \
-            "stdc_" #name " requires value to have an unsigned integer " \
-            "type"); \
-        return __FREESTANDING_C_HDRS_STDBIT_OP_##name( \
-            __freestanding_c_hdrs_value); \
-    }
-__FREESTANDING_C_HDRS_STDBIT_OPERATIONS(__FREESTANDING_C_HDRS_STDBIT_DEFINE)
-#undef __FREESTANDING_C_HDRS_STDBIT_DEFINE
+#include <__fcxx/c_stdbit.h>
 
 #endif
-
-#undef __FREESTANDING_C_HDRS_STDBIT_OPERATIONS
 
 #endif
 

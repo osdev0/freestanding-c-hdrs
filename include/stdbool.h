@@ -19,21 +19,11 @@
 
 #pragma GCC system_header
 
-#if (defined(__cplusplus) && __cplusplus < 201103L) \
- || (!defined(__cplusplus) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L))
+#include <__freestanding_c_hdrs/revision.h>
+
+#if __FREESTANDING_C_HDRS_STDBOOL_REVISION < 199901L
 #  error "<stdbool.h> requires C99 or C++11 or later"
-#endif
-
-#ifndef __cplusplus
-
-/* Workaround: GCC 13 to 14, and Clang 15 to 17, all targets: their C23 mode
- * reports 202000L, the value they give the drafts of C23. That of Clang 15
- * lacks much of C23, but has the keywords bool, true, and false.
- */
-#if __STDC_VERSION__ >= 202311L \
- || (__STDC_VERSION__ > 201710L \
-     && ((defined(__clang__) && __clang_major__ >= 15) \
-         || (!defined(__clang__) && __GNUC__ >= 13)))
+#elif __FREESTANDING_C_HDRS_STDBOOL_REVISION >= 202311L
     /* These do not need to be defined for C23+. */
 #else
 #  undef bool
@@ -43,8 +33,6 @@
 #  define true 1
 #  undef false
 #  define false 0
-#endif
-
 #endif
 
 #undef __bool_true_false_are_defined

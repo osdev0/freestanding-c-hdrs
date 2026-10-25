@@ -19,10 +19,10 @@
 
 #pragma GCC system_header
 
-#if defined(__cplusplus)
-#  error "<stdnoreturn.h> is not a header of C++"
-#elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112L
-#  error "<stdnoreturn.h> requires C11 or later"
+#include <__freestanding_c_hdrs/revision.h>
+
+#if __FREESTANDING_C_HDRS_STDNORETURN_REVISION < 201112L
+#  error "<stdnoreturn.h> requires C11 or later, and is not a header of C++"
 #else
 #  define noreturn _Noreturn
 #endif

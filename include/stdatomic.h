@@ -19,24 +19,18 @@
 
 #pragma GCC system_header
 
-#if (defined(__cplusplus) && __cplusplus <= 202002L) \
- || (!defined(__cplusplus) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112L))
+#include <__freestanding_c_hdrs/revision.h>
+
+#if __FREESTANDING_C_HDRS_STDATOMIC_REVISION < 201112L
 #  error "<stdatomic.h> requires C11 or C++23 or later"
 /* GCC before 4.9 has no _Atomic, which it does not tell with
  * __STDC_NO_ATOMICS__ either.
  */
-#elif !defined(__cplusplus) && !defined(__clang__) && __GNUC__ == 4 \
- && __GNUC_MINOR__ < 9
+#elif !defined(__clang__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
 #  error "<stdatomic.h> requires a compiler with _Atomic"
 #elif !defined(__cplusplus)
 
-/* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
- * reports 202000L, the value they give the drafts of C23.
- */
-#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
-     && ((defined(__clang__) && __clang_major__ >= 16) \
-         || (!defined(__clang__) && __GNUC__ >= 13)))
+#if __FREESTANDING_C_HDRS_STDATOMIC_REVISION >= 202311L
 #  define __STDC_VERSION_STDATOMIC_H__ 202311L
 /* Workaround: Clang 16 to 18, all targets: its C23 mode does not tell whether
  * atomic char8_t is lock-free. In C23, char8_t is unsigned char, so the
@@ -107,10 +101,7 @@ typedef _Atomic(long) atomic_long;
 typedef _Atomic(unsigned long) atomic_ulong;
 typedef _Atomic(long long) atomic_llong;
 typedef _Atomic(unsigned long long) atomic_ullong;
-#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
-     && ((defined(__clang__) && __clang_major__ >= 16) \
-         || (!defined(__clang__) && __GNUC__ >= 13)))
+#if __FREESTANDING_C_HDRS_STDATOMIC_REVISION >= 202311L
 typedef _Atomic(unsigned char) atomic_char8_t;
 #endif
 typedef _Atomic(__CHAR16_TYPE__) atomic_char16_t;
@@ -364,134 +355,7 @@ void atomic_flag_clear_explicit(volatile atomic_flag *, memory_order);
 
 #else
 
-#if !__has_include(<atomic>)
-#  error "<stdatomic.h> requires <atomic> in C++"
-#else
-
-#include <atomic>
-
-template <class __freestanding_c_hdrs_t>
-using __freestanding_c_hdrs_atomic = std::atomic<__freestanding_c_hdrs_t>;
-
-#undef _Atomic
-#define _Atomic(T) ::__freestanding_c_hdrs_atomic<T>
-
-/* C++ has <stdatomic.h> itself define this, not <atomic>. */
-#undef __cpp_lib_stdatomic_h
-#define __cpp_lib_stdatomic_h 202011L
-
-using std::memory_order;
-using std::memory_order_relaxed;
-using std::memory_order_consume;
-using std::memory_order_acquire;
-using std::memory_order_release;
-using std::memory_order_acq_rel;
-using std::memory_order_seq_cst;
-
-using std::atomic_flag;
-
-using std::atomic_bool;
-using std::atomic_char;
-using std::atomic_schar;
-using std::atomic_uchar;
-using std::atomic_short;
-using std::atomic_ushort;
-using std::atomic_int;
-using std::atomic_uint;
-using std::atomic_long;
-using std::atomic_ulong;
-using std::atomic_llong;
-using std::atomic_ullong;
-#ifdef __cpp_char8_t
-using std::atomic_char8_t;
-#endif
-using std::atomic_char16_t;
-using std::atomic_char32_t;
-using std::atomic_wchar_t;
-
-#ifdef __INT8_TYPE__
-using std::atomic_int8_t;
-#endif
-#ifdef __UINT8_TYPE__
-using std::atomic_uint8_t;
-#endif
-#ifdef __INT16_TYPE__
-using std::atomic_int16_t;
-#endif
-#ifdef __UINT16_TYPE__
-using std::atomic_uint16_t;
-#endif
-#ifdef __INT32_TYPE__
-using std::atomic_int32_t;
-#endif
-#ifdef __UINT32_TYPE__
-using std::atomic_uint32_t;
-#endif
-#ifdef __INT64_TYPE__
-using std::atomic_int64_t;
-#endif
-#ifdef __UINT64_TYPE__
-using std::atomic_uint64_t;
-#endif
-
-using std::atomic_int_least8_t;
-using std::atomic_uint_least8_t;
-using std::atomic_int_least16_t;
-using std::atomic_uint_least16_t;
-using std::atomic_int_least32_t;
-using std::atomic_uint_least32_t;
-using std::atomic_int_least64_t;
-using std::atomic_uint_least64_t;
-
-using std::atomic_int_fast8_t;
-using std::atomic_uint_fast8_t;
-using std::atomic_int_fast16_t;
-using std::atomic_uint_fast16_t;
-using std::atomic_int_fast32_t;
-using std::atomic_uint_fast32_t;
-using std::atomic_int_fast64_t;
-using std::atomic_uint_fast64_t;
-
-#ifdef __INTPTR_TYPE__
-using std::atomic_intptr_t;
-#endif
-#ifdef __UINTPTR_TYPE__
-using std::atomic_uintptr_t;
-#endif
-using std::atomic_size_t;
-using std::atomic_ptrdiff_t;
-using std::atomic_intmax_t;
-using std::atomic_uintmax_t;
-
-using std::atomic_is_lock_free;
-using std::atomic_load;
-using std::atomic_load_explicit;
-using std::atomic_store;
-using std::atomic_store_explicit;
-using std::atomic_exchange;
-using std::atomic_exchange_explicit;
-using std::atomic_compare_exchange_strong;
-using std::atomic_compare_exchange_strong_explicit;
-using std::atomic_compare_exchange_weak;
-using std::atomic_compare_exchange_weak_explicit;
-using std::atomic_fetch_add;
-using std::atomic_fetch_add_explicit;
-using std::atomic_fetch_sub;
-using std::atomic_fetch_sub_explicit;
-using std::atomic_fetch_and;
-using std::atomic_fetch_and_explicit;
-using std::atomic_fetch_or;
-using std::atomic_fetch_or_explicit;
-using std::atomic_fetch_xor;
-using std::atomic_fetch_xor_explicit;
-using std::atomic_flag_test_and_set;
-using std::atomic_flag_test_and_set_explicit;
-using std::atomic_flag_clear;
-using std::atomic_flag_clear_explicit;
-using std::atomic_thread_fence;
-using std::atomic_signal_fence;
-
-#endif
+#include <__fcxx/c_stdatomic.h>
 
 #endif
 

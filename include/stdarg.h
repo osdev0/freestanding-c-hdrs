@@ -19,30 +19,15 @@
 
 #pragma GCC system_header
 
+#include <__freestanding_c_hdrs/revision.h>
+
 typedef __builtin_va_list va_list;
 
 #undef va_start
-/* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
- * reports 202000L, the value they give the drafts of C23.
- */
-#if (defined(__cplusplus) && __cplusplus > 202302L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
-     && ((defined(__clang__) && __clang_major__ >= 16) \
-         || (!defined(__clang__) && __GNUC__ >= 13)))
+#if __FREESTANDING_C_HDRS_STDARG_REVISION >= 202311L
 /* The builtin of C23 diagnoses unexpected arguments, as C23 recommends. */
 #  if __has_builtin(__builtin_c23_va_start)
 #    define va_start(...) __builtin_c23_va_start(__VA_ARGS__)
-#  elif defined(__clang__) && defined(__cplusplus)
-/* Workaround: Clang 17 up to at least 23, all targets: it has no builtin of
- * C23 for C++, and its -Wvarargs warns, in the code of the program, that the
- * 0 passed in its stead is not the last named parameter.
- */
-#    define va_start(v, ...) \
-         _Pragma("clang diagnostic push") \
-         _Pragma("clang diagnostic ignored \"-Wvarargs\"") \
-         __builtin_va_start(v, 0) \
-         _Pragma("clang diagnostic pop")
 #  elif defined(__clang__) && __clang_major__ < 19
 /* Workaround: Clang 16 to 18, all targets: -Wpedantic warns, in the code of
  * the program, that va_start(ap) leaves out the variadic arguments, so they
@@ -61,17 +46,17 @@ typedef __builtin_va_list va_list;
 #define va_end(v) __builtin_va_end(v)
 #undef va_arg
 #define va_arg(v, l) __builtin_va_arg(v, l)
-#if (defined(__cplusplus) && (__cplusplus >= 201103L)) || (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L))
+#if __FREESTANDING_C_HDRS_STDARG_REVISION >= 199901L
 #  undef va_copy
 #  define va_copy(d, s) __builtin_va_copy(d, s)
 #endif
 
-#if (defined(__cplusplus) && __cplusplus > 202302L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
-     && ((defined(__clang__) && __clang_major__ >= 16) \
-         || (!defined(__clang__) && __GNUC__ >= 13)))
+#if __FREESTANDING_C_HDRS_STDARG_REVISION >= 202311L
 #  define __STDC_VERSION_STDARG_H__ 202311L
+#endif
+
+#ifdef __cplusplus
+#  include <__fcxx/c_stdarg.h>
 #endif
 
 #endif

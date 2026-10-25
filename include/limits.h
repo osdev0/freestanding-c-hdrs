@@ -19,6 +19,8 @@
 
 #pragma GCC system_header
 
+#include <__freestanding_c_hdrs/revision.h>
+
 #undef CHAR_BIT
 #define CHAR_BIT __CHAR_BIT__
 
@@ -82,8 +84,7 @@
 #undef ULONG_MAX
 #define ULONG_MAX (LONG_MAX * 2UL + 1UL)
 
-#if (defined(__cplusplus) && __cplusplus >= 201103L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
+#if __FREESTANDING_C_HDRS_LIMITS_REVISION >= 199901L
 
 #undef LLONG_MAX
 #define LLONG_MAX __LONG_LONG_MAX__
@@ -95,14 +96,7 @@
 
 #endif
 
-/* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
- * reports 202000L, the value they give the drafts of C23.
- */
-#if (defined(__cplusplus) && __cplusplus > 202302L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
-     && ((defined(__clang__) && __clang_major__ >= 16) \
-         || (!defined(__clang__) && __GNUC__ >= 13)))
+#if __FREESTANDING_C_HDRS_LIMITS_REVISION >= 202311L
 
 #if defined(__clang__)
 #   undef CHAR_WIDTH

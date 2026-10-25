@@ -19,11 +19,14 @@
 
 #pragma GCC system_header
 
-#ifndef __cplusplus
+#include <__freestanding_c_hdrs/revision.h>
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199409L
+#if __FREESTANDING_C_HDRS_ISO646_REVISION < 199409L
 #  error "<iso646.h> requires C95 or later"
 #endif
+
+/* C++ has these names as operators. */
+#ifndef __cplusplus
 
 #undef and
 #define and &&

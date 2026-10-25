@@ -19,6 +19,8 @@
 
 #pragma GCC system_header
 
+#include <__freestanding_c_hdrs/revision.h>
+
 #undef FLT_ROUNDS
 #define FLT_ROUNDS 1
 
@@ -32,8 +34,7 @@
 #undef LDBL_MANT_DIG
 #define LDBL_MANT_DIG __LDBL_MANT_DIG__
 
-#if (defined(__cplusplus) && __cplusplus >= 201103L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
+#if __FREESTANDING_C_HDRS_FLOAT_REVISION >= 199901L
 
 #undef DECIMAL_DIG
 #define DECIMAL_DIG __DECIMAL_DIG__
@@ -99,8 +100,7 @@
 #undef LDBL_MIN
 #define LDBL_MIN __LDBL_MIN__
 
-#if (defined(__cplusplus) && __cplusplus > 201402L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L)
+#if __FREESTANDING_C_HDRS_FLOAT_REVISION >= 201112L
 
 #undef FLT_DECIMAL_DIG
 #define FLT_DECIMAL_DIG __FLT_DECIMAL_DIG__
@@ -126,14 +126,7 @@
 
 #endif
 
-/* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
- * reports 202000L, the value they give the drafts of C23.
- */
-#if (defined(__cplusplus) && __cplusplus > 202302L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L) \
- || (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L \
-     && ((defined(__clang__) && __clang_major__ >= 16) \
-         || (!defined(__clang__) && __GNUC__ >= 13)))
+#if __FREESTANDING_C_HDRS_FLOAT_REVISION >= 202311L
 
 #define __STDC_VERSION_FLOAT_H__ 202311L
 

@@ -1,1 +1,3 @@
 This is a collection of 0BSD-licensed freestanding C headers, for use with GCC or Clang.
+
+In C++, they take what C++ makes of them from freestanding-cxx-hdrs (https://github.com/osdev0/freestanding-cxx-hdrs), which has to be on the include path too.
