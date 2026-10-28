@@ -148,6 +148,7 @@
 #   define BITINT_MAXWIDTH __BITINT_MAXWIDTH__
 #endif
 
+#undef __STDC_VERSION_LIMITS_H__
 #define __STDC_VERSION_LIMITS_H__ 202311L
 #endif
 

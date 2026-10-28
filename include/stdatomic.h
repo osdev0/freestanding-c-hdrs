@@ -31,6 +31,7 @@
 #elif !defined(__cplusplus)
 
 #if __FREESTANDING_C_HDRS_STDATOMIC_REVISION >= 202311L
+#  undef __STDC_VERSION_STDATOMIC_H__
 #  define __STDC_VERSION_STDATOMIC_H__ 202311L
 /* Workaround: Clang 16 to 18, all targets: its C23 mode does not tell whether
  * atomic char8_t is lock-free. In C23, char8_t is unsigned char, so the

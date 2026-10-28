@@ -52,6 +52,7 @@ typedef __builtin_va_list va_list;
 #endif
 
 #if __FREESTANDING_C_HDRS_STDARG_REVISION >= 202311L
+#  undef __STDC_VERSION_STDARG_H__
 #  define __STDC_VERSION_STDARG_H__ 202311L
 #endif
 

@@ -130,6 +130,7 @@
 
 #if __FREESTANDING_C_HDRS_FLOAT_REVISION >= 202311L
 
+#undef __STDC_VERSION_FLOAT_H__
 #define __STDC_VERSION_FLOAT_H__ 202311L
 
 /* GCC defines the __*_HAS_* macros as 0 where the format lacks the values. */

@@ -25,6 +25,7 @@
 #  error "<stdckdint.h> requires C23 or C++26 or later"
 #else
 
+#undef __STDC_VERSION_STDCKDINT_H__
 #define __STDC_VERSION_STDCKDINT_H__ 202311L
 
 #ifndef __cplusplus

@@ -75,6 +75,7 @@ typedef struct {
 #endif
 
 #if __FREESTANDING_C_HDRS_STDDEF_REVISION >= 202311L
+#  undef __STDC_VERSION_STDDEF_H__
 #  define __STDC_VERSION_STDDEF_H__ 202311L
 #endif
 

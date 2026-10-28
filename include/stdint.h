@@ -392,6 +392,7 @@ typedef __INTMAX_TYPE__ intmax_t;
 #undef WINT_WIDTH
 #define WINT_WIDTH __WINT_WIDTH__
 
+#undef __STDC_VERSION_STDINT_H__
 #define __STDC_VERSION_STDINT_H__ 202311L
 #endif
 

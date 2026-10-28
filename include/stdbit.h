@@ -25,11 +25,15 @@
 #  error "<stdbit.h> requires C23 or C++26 or later"
 #else
 
+#undef __STDC_VERSION_STDBIT_H__
 #define __STDC_VERSION_STDBIT_H__ 202311L
 
 /* The byte orders, in the values the compilers give them. */
+#undef __STDC_ENDIAN_LITTLE__
 #define __STDC_ENDIAN_LITTLE__ __ORDER_LITTLE_ENDIAN__
+#undef __STDC_ENDIAN_BIG__
 #define __STDC_ENDIAN_BIG__ __ORDER_BIG_ENDIAN__
+#undef __STDC_ENDIAN_NATIVE__
 #define __STDC_ENDIAN_NATIVE__ __BYTE_ORDER__
 
 /* The type names the header makes available, which <stddef.h> and

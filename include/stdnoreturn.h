@@ -24,6 +24,7 @@
 #if __FREESTANDING_C_HDRS_STDNORETURN_REVISION < 201112L
 #  error "<stdnoreturn.h> requires C11 or later, and is not a header of C++"
 #else
+#  undef noreturn
 #  define noreturn _Noreturn
 #endif
 
