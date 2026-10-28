@@ -32,7 +32,7 @@
 
 #if defined(__has_include)
 #  if !__has_include(<__fcxx/c_revision.h>)
-#    error "the C headers require freestanding-cxx-hdrs in C++"
+#    error "The C headers require freestanding-cxx-hdrs in C++"
 #  endif
 #endif
 #include <__fcxx/c_revision.h>
