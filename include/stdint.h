@@ -81,8 +81,10 @@ typedef __INTPTR_TYPE__ intptr_t;
 typedef __UINTMAX_TYPE__ uintmax_t;
 typedef __INTMAX_TYPE__ intmax_t;
 
-/* Clang and GCC have different mechanisms for INT32_C and friends. */
-#ifdef __clang__
+/* Workaround: Clang 6 to 19, all targets: it does not define __INT8_C() and
+ * the others, only the suffixes that they append, which GCC does not define.
+ */
+#ifndef __INTMAX_C
 #   ifndef __FREESTANDING_C_HDRS_C_JOIN
 #       define __FREESTANDING_C_HDRS_C_EXPAND_JOIN(x, suffix) x ## suffix
 #       define __FREESTANDING_C_HDRS_C_JOIN(x, suffix) __FREESTANDING_C_HDRS_C_EXPAND_JOIN(x, suffix)
@@ -271,9 +273,9 @@ typedef __INTMAX_TYPE__ intmax_t;
 #undef SIZE_MAX
 #define SIZE_MAX __SIZE_MAX__
 
-/* The minimums of the unsigned types are 0 of their promoted types. GCC and
- * Clang 23 and later tell the minimums, and earlier Clang whether wchar_t
- * and wint_t are unsigned.
+/* Workaround: Clang 6 to 22, all targets: it does not tell the minimums of
+ * wchar_t and wint_t, only whether they are unsigned, which GCC does not tell,
+ * and the minimums of the unsigned types are 0 of their promoted types.
  */
 #undef WCHAR_MAX
 #define WCHAR_MAX __WCHAR_MAX__
