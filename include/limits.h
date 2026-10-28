@@ -24,9 +24,9 @@
 #undef CHAR_BIT
 #define CHAR_BIT __CHAR_BIT__
 
-#ifndef MB_LEN_MAX
-#   define MB_LEN_MAX 1
-#endif
+/* MB_LEN_MAX is left out. It is the most bytes that a multibyte character has
+ * in any of the locales, and only a hosted environment has locales.
+ */
 
 #undef SCHAR_MAX
 #define SCHAR_MAX __SCHAR_MAX__
