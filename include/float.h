@@ -160,26 +160,21 @@
 
 /* Workaround: Clang up to at least 23, all targets: it does not tell whether
  * the types have the radix, precision, and exponent range of an ISO/IEC 60559
- * format. Of its formats, binary16, binary32, binary64, binary128, and the
- * binary64-extended format of x87 do, with the parameters of C23 Annex H.
+ * format, which is then worked out for GCC too. Of the formats of the two,
+ * binary16, binary32, binary64, binary128, and the binary64-extended format
+ * of x87 do, with the parameters of C23 Annex H.
  */
 #undef FLT_IS_IEC_60559
 #undef DBL_IS_IEC_60559
 #undef LDBL_IS_IEC_60559
-#ifdef __FLT_IS_IEC_60559__
-#  define FLT_IS_IEC_60559 __FLT_IS_IEC_60559__
-#  define DBL_IS_IEC_60559 __DBL_IS_IEC_60559__
-#  define LDBL_IS_IEC_60559 __LDBL_IS_IEC_60559__
-#else
-#  define __FREESTANDING_C_HDRS_IS_IEC_60559(p, emin, emax) \
-       (__FLT_RADIX__ == 2 && (emin) == 3 - (emax) \
-           && (((p) == 11 && (emax) == 16) || ((p) == 24 && (emax) == 128) \
-               || ((p) == 53 && (emax) == 1024) || ((p) == 64 && (emax) == 16384) \
-               || ((p) == 113 && (emax) == 16384)))
-#  define FLT_IS_IEC_60559 __FREESTANDING_C_HDRS_IS_IEC_60559(__FLT_MANT_DIG__, __FLT_MIN_EXP__, __FLT_MAX_EXP__)
-#  define DBL_IS_IEC_60559 __FREESTANDING_C_HDRS_IS_IEC_60559(__DBL_MANT_DIG__, __DBL_MIN_EXP__, __DBL_MAX_EXP__)
-#  define LDBL_IS_IEC_60559 __FREESTANDING_C_HDRS_IS_IEC_60559(__LDBL_MANT_DIG__, __LDBL_MIN_EXP__, __LDBL_MAX_EXP__)
-#endif
+#define __FREESTANDING_C_HDRS_IS_IEC_60559(p, emin, emax) \
+    (__FLT_RADIX__ == 2 && (emin) == 3 - (emax) \
+        && (((p) == 11 && (emax) == 16) || ((p) == 24 && (emax) == 128) \
+            || ((p) == 53 && (emax) == 1024) || ((p) == 64 && (emax) == 16384) \
+            || ((p) == 113 && (emax) == 16384)))
+#define FLT_IS_IEC_60559 __FREESTANDING_C_HDRS_IS_IEC_60559(__FLT_MANT_DIG__, __FLT_MIN_EXP__, __FLT_MAX_EXP__)
+#define DBL_IS_IEC_60559 __FREESTANDING_C_HDRS_IS_IEC_60559(__DBL_MANT_DIG__, __DBL_MIN_EXP__, __DBL_MAX_EXP__)
+#define LDBL_IS_IEC_60559 __FREESTANDING_C_HDRS_IS_IEC_60559(__LDBL_MANT_DIG__, __LDBL_MIN_EXP__, __LDBL_MAX_EXP__)
 
 /* Workaround: Clang 16 to 18, all targets: it does not tell the largest
  * normalised numbers. Those are the largest finite numbers, except for the
@@ -188,18 +183,12 @@
 #undef FLT_NORM_MAX
 #undef DBL_NORM_MAX
 #undef LDBL_NORM_MAX
-#ifdef __FLT_NORM_MAX__
-#  define FLT_NORM_MAX __FLT_NORM_MAX__
-#  define DBL_NORM_MAX __DBL_NORM_MAX__
-#  define LDBL_NORM_MAX __LDBL_NORM_MAX__
+#define FLT_NORM_MAX __FLT_MAX__
+#define DBL_NORM_MAX __DBL_MAX__
+#if __LDBL_MANT_DIG__ == 106
+#  define LDBL_NORM_MAX 0x1.ffffffffffffffffffffffffff8p+1022L
 #else
-#  define FLT_NORM_MAX __FLT_MAX__
-#  define DBL_NORM_MAX __DBL_MAX__
-#  if __LDBL_MANT_DIG__ == 106
-#    define LDBL_NORM_MAX 0x1.ffffffffffffffffffffffffff8p+1022L
-#  else
-#    define LDBL_NORM_MAX __LDBL_MAX__
-#  endif
+#  define LDBL_NORM_MAX __LDBL_MAX__
 #endif
 
 #endif
