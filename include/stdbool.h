@@ -23,7 +23,9 @@
 
 #if __FREESTANDING_C_HDRS_STDBOOL_REVISION < 199901L
 #  error "<stdbool.h> requires C99 or C++11 or later"
-#elif __FREESTANDING_C_HDRS_STDBOOL_REVISION >= 202311L
+#else
+
+#if __FREESTANDING_C_HDRS_STDBOOL_REVISION >= 202311L
     /* These do not need to be defined for C23+. */
 #else
 #  undef bool
@@ -37,5 +39,7 @@
 
 #undef __bool_true_false_are_defined
 #define __bool_true_false_are_defined 1
+
+#endif
 
 #endif
