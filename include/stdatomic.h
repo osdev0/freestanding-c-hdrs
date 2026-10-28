@@ -38,11 +38,7 @@
  * answer for char applies.
  */
 #  undef ATOMIC_CHAR8_T_LOCK_FREE
-#  ifdef __GCC_ATOMIC_CHAR8_T_LOCK_FREE
-#    define ATOMIC_CHAR8_T_LOCK_FREE __GCC_ATOMIC_CHAR8_T_LOCK_FREE
-#  else
-#    define ATOMIC_CHAR8_T_LOCK_FREE __GCC_ATOMIC_CHAR_LOCK_FREE
-#  endif
+#  define ATOMIC_CHAR8_T_LOCK_FREE __GCC_ATOMIC_CHAR_LOCK_FREE
 #else
 #  undef ATOMIC_VAR_INIT
 #  define ATOMIC_VAR_INIT(value) (value)
@@ -65,7 +61,15 @@
 #undef ATOMIC_LONG_LOCK_FREE
 #define ATOMIC_LONG_LOCK_FREE __GCC_ATOMIC_LONG_LOCK_FREE
 #undef ATOMIC_LLONG_LOCK_FREE
-#define ATOMIC_LLONG_LOCK_FREE __GCC_ATOMIC_LLONG_LOCK_FREE
+/* Workaround: Clang 6 to 14, i386: it tells long long as only sometimes
+ * lock-free, as long long is aligned to 4 there, but atomic_llong is aligned
+ * to 8, which makes it always lock-free with cmpxchg8b, as GCC tells.
+ */
+#if defined(__i386__) && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8)
+#  define ATOMIC_LLONG_LOCK_FREE 2
+#else
+#  define ATOMIC_LLONG_LOCK_FREE __GCC_ATOMIC_LLONG_LOCK_FREE
+#endif
 #undef ATOMIC_POINTER_LOCK_FREE
 #define ATOMIC_POINTER_LOCK_FREE __GCC_ATOMIC_POINTER_LOCK_FREE
 
