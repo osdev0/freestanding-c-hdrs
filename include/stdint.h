@@ -23,7 +23,7 @@
 
 #if __FREESTANDING_C_HDRS_STDINT_REVISION < 199901L
 #  error "<stdint.h> requires C99 or C++11 or later"
-#endif
+#else
 
 #ifdef __UINT8_TYPE__
 typedef __UINT8_TYPE__ uint8_t;
@@ -397,6 +397,8 @@ typedef __INTMAX_TYPE__ intmax_t;
 
 #ifdef __cplusplus
 #   include <__fcxx/c_stdint.h>
+#endif
+
 #endif
 
 #endif
