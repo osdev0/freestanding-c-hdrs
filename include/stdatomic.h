@@ -156,7 +156,7 @@ typedef _Atomic(__UINTMAX_TYPE__) atomic_uintmax_t;
 #undef atomic_fetch_and_explicit
 #ifdef __clang__
 #  define atomic_init(obj, value) __c11_atomic_init((obj), (value))
-/* Workaround: Clang 3.5 to 10, all targets: its __c11_atomic_is_lock_free
+/* Workaround: Clang 6 to 10, all targets: its __c11_atomic_is_lock_free
  * yields an int, not a _Bool.
  */
 #  define atomic_is_lock_free(obj) \
