@@ -21,8 +21,10 @@
 
 #include <__freestanding_c_hdrs/revision.h>
 
-#undef FLT_ROUNDS
-#define FLT_ROUNDS 1
+/* FLT_ROUNDS is left out. It is the rounding mode of floating-point addition
+ * at run time, which only the state of the floating-point unit tells, and
+ * which the compilers cannot read on every target.
+ */
 
 #undef FLT_RADIX
 #define FLT_RADIX __FLT_RADIX__
