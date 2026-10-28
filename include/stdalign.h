@@ -23,7 +23,9 @@
 
 #if __FREESTANDING_C_HDRS_STDALIGN_REVISION < 201112L
 #  error "<stdalign.h> requires C11 or C++11 or later"
-#elif __FREESTANDING_C_HDRS_STDALIGN_REVISION >= 202311L
+#else
+
+#if __FREESTANDING_C_HDRS_STDALIGN_REVISION >= 202311L
     /* These do not need to be defined for C23+. */
 #else
 #  undef alignas
@@ -39,6 +41,8 @@
 
 #ifdef __cplusplus
 #  include <__fcxx/c_stdalign.h>
+#endif
+
 #endif
 
 #endif
