@@ -108,7 +108,10 @@
 #define FLT_DECIMAL_DIG __FLT_DECIMAL_DIG__
 #undef DBL_DECIMAL_DIG
 #define DBL_DECIMAL_DIG __DBL_DECIMAL_DIG__
-/* GCC before 7 lacks __LDBL_DECIMAL_DIG__, but __DECIMAL_DIG__ is the same. */
+/* Workaround: GCC 4.8 to 6, all targets: it does not tell the decimal digits
+ * of long double, but those of DECIMAL_DIG are the same, as long double is
+ * the widest type.
+ */
 #undef LDBL_DECIMAL_DIG
 #define LDBL_DECIMAL_DIG __DECIMAL_DIG__
 
