@@ -23,7 +23,7 @@
 
 #if __FREESTANDING_C_HDRS_ISO646_REVISION < 199409L
 #  error "<iso646.h> requires C95 or later"
-#endif
+#else
 
 /* C++ has these names as operators. */
 #ifndef __cplusplus
@@ -50,6 +50,8 @@
 #define xor ^
 #undef xor_eq
 #define xor_eq ^=
+
+#endif
 
 #endif
 
