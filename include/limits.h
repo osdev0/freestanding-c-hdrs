@@ -98,21 +98,15 @@
 
 #if __FREESTANDING_C_HDRS_LIMITS_REVISION >= 202311L
 
-#if defined(__clang__)
+/* C23 has the widths of the character types expand to the same value as
+ * CHAR_BIT.
+ */
 #   undef CHAR_WIDTH
 #   define CHAR_WIDTH CHAR_BIT
 #   undef SCHAR_WIDTH
 #   define SCHAR_WIDTH CHAR_BIT
 #   undef UCHAR_WIDTH
 #   define UCHAR_WIDTH CHAR_BIT
-#else
-#   undef CHAR_WIDTH
-#   define CHAR_WIDTH __SCHAR_WIDTH__
-#   undef SCHAR_WIDTH
-#   define SCHAR_WIDTH __SCHAR_WIDTH__
-#   undef UCHAR_WIDTH
-#   define UCHAR_WIDTH __SCHAR_WIDTH__
-#endif
 #   undef SHRT_WIDTH
 #   define SHRT_WIDTH __SHRT_WIDTH__
 #   undef USHRT_WIDTH
@@ -125,6 +119,9 @@
 #   define LONG_WIDTH __LONG_WIDTH__
 #   undef ULONG_WIDTH
 #   define ULONG_WIDTH __LONG_WIDTH__
+/* GCC names the width of long long __LONG_LONG_WIDTH__, as it does its
+ * __LONG_LONG_MAX__, and Clang names it __LLONG_WIDTH__.
+ */
 #if defined(__clang__)
 #   undef LLONG_WIDTH
 #   define LLONG_WIDTH __LLONG_WIDTH__
