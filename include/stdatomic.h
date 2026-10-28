@@ -142,6 +142,21 @@ typedef _Atomic(__PTRDIFF_TYPE__) atomic_ptrdiff_t;
 typedef _Atomic(__INTMAX_TYPE__) atomic_intmax_t;
 typedef _Atomic(__UINTMAX_TYPE__) atomic_uintmax_t;
 
+/* The orders given to the compare-and-exchanges. On the AVR and the MSP430,
+ * whose single core performs the accesses to memory in the order of the
+ * program, every order is as strong as seq_cst, so they are given seq_cst
+ * there, with every compiler.
+ * Workaround: Clang 19 to 23, AVR and MSP430: it crashes selecting the
+ * instructions of a compare-and-exchange whose order of failure is known only
+ * at run time.
+ */
+#if defined(__AVR__) || defined(__MSP430__)
+#  define __FREESTANDING_C_HDRS_CAS_ORDER(order) \
+       ((void)(order), memory_order_seq_cst)
+#else
+#  define __FREESTANDING_C_HDRS_CAS_ORDER(order) (order)
+#endif
+
 /* Clang's __atomic builtins reject _Atomic objects, but its __c11_atomic
  * builtins take them. GCC has none of those, but its generic __atomic builtins
  * take _Atomic objects of any type, through pointers.
@@ -173,11 +188,17 @@ typedef _Atomic(__UINTMAX_TYPE__) atomic_uintmax_t;
 #  define atomic_compare_exchange_strong_explicit(obj, expected, desired, \
                                                   success, failure) \
        __c11_atomic_compare_exchange_strong((obj), (expected), (desired), \
-                                            (success), (failure))
+                                            __FREESTANDING_C_HDRS_CAS_ORDER( \
+                                                success), \
+                                            __FREESTANDING_C_HDRS_CAS_ORDER( \
+                                                failure))
 #  define atomic_compare_exchange_weak_explicit(obj, expected, desired, \
                                                 success, failure) \
        __c11_atomic_compare_exchange_weak((obj), (expected), (desired), \
-                                          (success), (failure))
+                                          __FREESTANDING_C_HDRS_CAS_ORDER( \
+                                              success), \
+                                          __FREESTANDING_C_HDRS_CAS_ORDER( \
+                                              failure))
 #  define atomic_fetch_add_explicit(obj, operand, order) \
        __c11_atomic_fetch_add((obj), (operand), (order))
 #  define atomic_fetch_sub_explicit(obj, operand, order) \
@@ -240,7 +261,11 @@ typedef _Atomic(__UINTMAX_TYPE__) atomic_uintmax_t;
            (_Bool)__atomic_compare_exchange(__freestanding_c_hdrs_obj, \
                                             (expected), \
                                             &__freestanding_c_hdrs_desired, \
-                                            0, (success), (failure)); \
+                                            0, \
+                                            __FREESTANDING_C_HDRS_CAS_ORDER( \
+                                                success), \
+                                            __FREESTANDING_C_HDRS_CAS_ORDER( \
+                                                failure)); \
        })
 #  define atomic_compare_exchange_weak_explicit(obj, expected, desired, \
                                                 success, failure) \
@@ -251,7 +276,11 @@ typedef _Atomic(__UINTMAX_TYPE__) atomic_uintmax_t;
            (_Bool)__atomic_compare_exchange(__freestanding_c_hdrs_obj, \
                                             (expected), \
                                             &__freestanding_c_hdrs_desired, \
-                                            1, (success), (failure)); \
+                                            1, \
+                                            __FREESTANDING_C_HDRS_CAS_ORDER( \
+                                                success), \
+                                            __FREESTANDING_C_HDRS_CAS_ORDER( \
+                                                failure)); \
        })
 /* GCC's __atomic_fetch_add and __atomic_fetch_sub, whose arithmetic wraps
  * around, take the operand of a pointer in bytes, so the macros below scale it
@@ -338,7 +367,22 @@ void atomic_flag_clear_explicit(volatile atomic_flag *, memory_order);
 
 #undef atomic_thread_fence
 #undef atomic_signal_fence
-#ifdef __clang__
+/* On the AVR and the MSP430, whose single core performs the accesses to memory
+ * in the order of the program, and whose only other threads are the interrupt
+ * handlers, a fence needs to be no more than a barrier to the compiler, which
+ * is what it is there, with every compiler.
+ * Workaround: Clang 6 to 23, MSP430: it cannot select any fence.
+ */
+#if defined(__AVR__) || defined(__MSP430__)
+#  define __FREESTANDING_C_HDRS_FENCE(order) \
+       __extension__ ({ \
+           if ((order) != memory_order_relaxed) { \
+               __asm__ __volatile__("" ::: "memory"); \
+           } \
+       })
+#  define atomic_thread_fence(order) __FREESTANDING_C_HDRS_FENCE(order)
+#  define atomic_signal_fence(order) __FREESTANDING_C_HDRS_FENCE(order)
+#elif defined(__clang__)
 #  define atomic_thread_fence(order) __c11_atomic_thread_fence((order))
 #  define atomic_signal_fence(order) __c11_atomic_signal_fence((order))
 #else
