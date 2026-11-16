@@ -1,6 +1,6 @@
-/* SPDX-License-Identifier: 0BSD */
-
-/* Copyright (C) 2022-2026 Mintsuki and contributors.
+/* SPDX-License-Identifier: 0BSD
+ *
+ * Copyright (C) 2022-2026 Mintsuki and contributors.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
@@ -19,6 +19,7 @@
    in C, the revision in use, and in C++, what freestanding-cxx-hdrs, which has
    all that C++ makes of the headers, tells. Where it is missing, the error
    below comes before that of its include, which ends the compilation. */
+
 #ifndef __FREESTANDING_C_HDRS_REVISION_H
 #define __FREESTANDING_C_HDRS_REVISION_H 1
 
@@ -38,13 +39,7 @@
     || (!defined(__clang__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8)))
 #       error "The C headers require GCC 4.8 or later, or Clang 6 or later."
 #   endif
-#endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifndef __cplusplus
     /* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23
        mode reports 202000L, the value they give the drafts of C23. */
 #   if defined(__STDC_VERSION__) \
@@ -79,10 +74,6 @@ extern "C" {
 #   else
 #       define __FREESTANDING_C_HDRS_STDBOOL_REVISION __FREESTANDING_C_HDRS_C
 #   endif
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif

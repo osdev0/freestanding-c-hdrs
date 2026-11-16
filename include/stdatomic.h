@@ -1,6 +1,6 @@
-/* SPDX-License-Identifier: 0BSD */
-
-/* Copyright (C) 2022-2026 Mintsuki and contributors.
+/* SPDX-License-Identifier: 0BSD
+ *
+ * Copyright (C) 2022-2026 Mintsuki and contributors.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
@@ -27,13 +27,7 @@
        __STDC_NO_ATOMICS__ either. */
 #elif !defined(__clang__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
 #   error "<stdatomic.h> requires a compiler with _Atomic."
-#else
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifndef __cplusplus
+#elif !defined(__cplusplus)
 
 #if __FREESTANDING_C_HDRS_STDATOMIC_REVISION >= 202311L
 #   undef __STDC_VERSION_STDATOMIC_H__
@@ -391,16 +385,8 @@ void atomic_flag_clear_explicit(volatile atomic_flag *, memory_order);
 #define atomic_flag_clear(obj) \
     atomic_flag_clear_explicit((obj), memory_order_seq_cst)
 
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
-#ifdef __cplusplus
+#else
 #   include <__fcxx/c_stdatomic.h>
-#endif
-
 #endif
 
 #endif

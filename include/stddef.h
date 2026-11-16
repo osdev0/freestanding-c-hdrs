@@ -1,6 +1,6 @@
-/* SPDX-License-Identifier: 0BSD */
-
-/* Copyright (C) 2022-2026 Mintsuki and contributors.
+/* SPDX-License-Identifier: 0BSD
+ *
+ * Copyright (C) 2022-2026 Mintsuki and contributors.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
@@ -20,10 +20,6 @@
 #pragma GCC system_header
 
 #include <__freestanding_c_hdrs/revision.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* On LLP64 targets these are long long, which C90 and C++98 do not have. */
 __extension__ typedef __SIZE_TYPE__ size_t;
@@ -79,10 +75,6 @@ typedef struct {
 #if __FREESTANDING_C_HDRS_STDDEF_REVISION >= 202311L
 #   undef __STDC_VERSION_STDDEF_H__
 #   define __STDC_VERSION_STDDEF_H__ 202311L
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #ifdef __cplusplus

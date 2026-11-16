@@ -1,6 +1,6 @@
-/* SPDX-License-Identifier: 0BSD */
-
-/* Copyright (C) 2022-2026 Mintsuki and contributors.
+/* SPDX-License-Identifier: 0BSD
+ *
+ * Copyright (C) 2022-2026 Mintsuki and contributors.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
@@ -25,10 +25,6 @@
 #   error "<stdalign.h> requires C11 or C++11 or later."
 #else
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #if __FREESTANDING_C_HDRS_STDALIGN_REVISION >= 202311L
     /* These do not need to be defined for C23+. */
 #else
@@ -41,10 +37,6 @@ extern "C" {
 #   define __alignas_is_defined 1
 #   undef __alignof_is_defined
 #   define __alignof_is_defined 1
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #ifdef __cplusplus

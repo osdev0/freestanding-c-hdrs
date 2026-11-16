@@ -1,6 +1,6 @@
-/* SPDX-License-Identifier: 0BSD */
-
-/* Copyright (C) 2022-2026 Mintsuki and contributors.
+/* SPDX-License-Identifier: 0BSD
+ *
+ * Copyright (C) 2022-2026 Mintsuki and contributors.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
@@ -24,10 +24,6 @@
 #if __FREESTANDING_C_HDRS_STDINT_REVISION < 199901L
 #   error "<stdint.h> requires C99 or C++11 or later."
 #else
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifdef __UINT8_TYPE__
 typedef __UINT8_TYPE__ uint8_t;
@@ -398,10 +394,6 @@ typedef __INTMAX_TYPE__ intmax_t;
 
 #   undef __STDC_VERSION_STDINT_H__
 #   define __STDC_VERSION_STDINT_H__ 202311L
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #ifdef __cplusplus

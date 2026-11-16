@@ -1,6 +1,6 @@
-/* SPDX-License-Identifier: 0BSD */
-
-/* Copyright (C) 2022-2026 Mintsuki and contributors.
+/* SPDX-License-Identifier: 0BSD
+ *
+ * Copyright (C) 2022-2026 Mintsuki and contributors.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
@@ -20,10 +20,6 @@
 #pragma GCC system_header
 
 #include <__freestanding_c_hdrs/revision.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* FLT_ROUNDS is left out. It is the rounding mode of floating-point addition
    at run time, which only the state of the floating-point unit tells, and
@@ -191,10 +187,6 @@ extern "C" {
 #   else
 #       define LDBL_NORM_MAX __LDBL_MAX__
 #   endif
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif

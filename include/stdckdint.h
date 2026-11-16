@@ -1,6 +1,6 @@
-/* SPDX-License-Identifier: 0BSD */
-
-/* Copyright (C) 2022-2026 Mintsuki and contributors.
+/* SPDX-License-Identifier: 0BSD
+ *
+ * Copyright (C) 2022-2026 Mintsuki and contributors.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
@@ -25,10 +25,6 @@
 #   error "<stdckdint.h> requires C23 or C++26 or later."
 #else
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #undef __STDC_VERSION_STDCKDINT_H__
 #define __STDC_VERSION_STDCKDINT_H__ 202311L
 
@@ -39,13 +35,7 @@ extern "C" {
 #   define ckd_sub(result, a, b) (__builtin_sub_overflow((a), (b), (result)))
 #   undef ckd_mul
 #   define ckd_mul(result, a, b) (__builtin_mul_overflow((a), (b), (result)))
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
-#ifdef __cplusplus
+#else
 #   include <__fcxx/c_stdckdint.h>
 #endif
 

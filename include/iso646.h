@@ -1,6 +1,6 @@
-/* SPDX-License-Identifier: 0BSD */
-
-/* Copyright (C) 2022-2026 Mintsuki and contributors.
+/* SPDX-License-Identifier: 0BSD
+ *
+ * Copyright (C) 2022-2026 Mintsuki and contributors.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
@@ -24,10 +24,6 @@
 #if __FREESTANDING_C_HDRS_ISO646_REVISION < 199409L
 #   error "<iso646.h> requires C95 or later."
 #else
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* C++ has these names as operators. */
 #ifndef __cplusplus
@@ -53,10 +49,6 @@ extern "C" {
 #   define xor ^
 #   undef xor_eq
 #   define xor_eq ^=
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif

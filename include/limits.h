@@ -1,6 +1,6 @@
-/* SPDX-License-Identifier: 0BSD */
-
-/* Copyright (C) 2022-2026 Mintsuki and contributors.
+/* SPDX-License-Identifier: 0BSD
+ *
+ * Copyright (C) 2022-2026 Mintsuki and contributors.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
@@ -20,10 +20,6 @@
 #pragma GCC system_header
 
 #include <__freestanding_c_hdrs/revision.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #undef CHAR_BIT
 #define CHAR_BIT __CHAR_BIT__
@@ -145,10 +141,6 @@ extern "C" {
 
 #   undef __STDC_VERSION_LIMITS_H__
 #   define __STDC_VERSION_LIMITS_H__ 202311L
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif

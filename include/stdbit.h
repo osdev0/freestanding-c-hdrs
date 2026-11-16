@@ -1,6 +1,6 @@
-/* SPDX-License-Identifier: 0BSD */
-
-/* Copyright (C) 2022-2026 Mintsuki and contributors.
+/* SPDX-License-Identifier: 0BSD
+ *
+ * Copyright (C) 2022-2026 Mintsuki and contributors.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
@@ -24,10 +24,6 @@
 #if __FREESTANDING_C_HDRS_STDBIT_REVISION < 202311L
 #   error "<stdbit.h> requires C23 or C++26 or later."
 #else
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #undef __STDC_VERSION_STDBIT_H__
 #define __STDC_VERSION_STDBIT_H__ 202311L
@@ -155,9 +151,9 @@ typedef __INT_LEAST64_TYPE__ int_least64_t;
 /* The operations, on such an x, with results of the types of those of the
    functions: the first bits are at their index plus 1, or at 0 where there is
    none, and the ceiling is 0 where it cannot be represented, which a shift of
-   2 rather than of 1 gives. The floor and the ceiling are converted to the
-   type of x as a whole, as C promotes the operands of the conditional
-   operator. */
+   2 rather than of 1 gives. The floor and the ceiling go to a local of the
+   type of x, which converts them back to it, as C promotes the operands of a
+   shift. */
 #define __FREESTANDING_C_HDRS_STDBIT_NOT(x) ((typeof(x))~(x))
 #define __FREESTANDING_C_HDRS_STDBIT_OP_leading_zeros(x) \
     ((unsigned int)__FREESTANDING_C_HDRS_STDBIT_CLZ(x, __FREESTANDING_C_HDRS_STDBIT_WIDTH(x)))
@@ -185,18 +181,28 @@ typedef __INT_LEAST64_TYPE__ int_least64_t;
 #define __FREESTANDING_C_HDRS_STDBIT_OP_bit_width(x) \
     ((unsigned int)(__FREESTANDING_C_HDRS_STDBIT_WIDTH(x) \
                   - __FREESTANDING_C_HDRS_STDBIT_CLZ(x, __FREESTANDING_C_HDRS_STDBIT_WIDTH(x))))
-#define __FREESTANDING_C_HDRS_STDBIT_OP_bit_floor(x) \
-    ((typeof(x))((x) == 0 \
-               ? 0 \
-               : (typeof(x))1 \
-                  << (__FREESTANDING_C_HDRS_STDBIT_WIDTH(x) - 1 \
-                    - __FREESTANDING_C_HDRS_STDBIT_CLZ(x, 0))))
-#define __FREESTANDING_C_HDRS_STDBIT_OP_bit_ceil(x) \
-    ((typeof(x))((x) <= 1 \
-               ? 1 \
-               : (typeof(x))2 \
-                  << (__FREESTANDING_C_HDRS_STDBIT_WIDTH(x) - 1 \
-                    - __FREESTANDING_C_HDRS_STDBIT_CLZ((typeof(x))((x) - 1), 0))))
+#define __FREESTANDING_C_HDRS_STDBIT_OP_bit_floor(x) __extension__ ({ \
+    typeof(x) __freestanding_c_hdrs_floor; \
+    if ((x) == 0) { \
+        __freestanding_c_hdrs_floor = 0; \
+    } else { \
+        __freestanding_c_hdrs_floor = (typeof(x))1 \
+                                   << (__FREESTANDING_C_HDRS_STDBIT_WIDTH(x) - 1 \
+                                     - __FREESTANDING_C_HDRS_STDBIT_CLZ(x, 0)); \
+    } \
+    __freestanding_c_hdrs_floor; \
+})
+#define __FREESTANDING_C_HDRS_STDBIT_OP_bit_ceil(x) __extension__ ({ \
+    typeof(x) __freestanding_c_hdrs_ceil; \
+    if ((x) <= 1) { \
+        __freestanding_c_hdrs_ceil = 1; \
+    } else { \
+        __freestanding_c_hdrs_ceil = (typeof(x))2 \
+                                  << (__FREESTANDING_C_HDRS_STDBIT_WIDTH(x) - 1 \
+                                    - __FREESTANDING_C_HDRS_STDBIT_CLZ((typeof(x))((x) - 1), 0)); \
+    } \
+    __freestanding_c_hdrs_ceil; \
+})
 
 /* Each operation, F(name, its results for unsigned char, short, int, long, and
    long long). */
@@ -559,13 +565,7 @@ unsigned long long __freestanding_c_hdrs_stdbit_ull(unsigned long long);
 
 #undef __FREESTANDING_C_HDRS_STDBIT_OPERATIONS
 
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
-#ifdef __cplusplus
+#else
 #   include <__fcxx/c_stdbit.h>
 #endif
 
