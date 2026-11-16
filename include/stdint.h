@@ -22,8 +22,12 @@
 #include <__freestanding_c_hdrs/revision.h>
 
 #if __FREESTANDING_C_HDRS_STDINT_REVISION < 199901L
-#  error "<stdint.h> requires C99 or C++11 or later"
+#   error "<stdint.h> requires C99 or C++11 or later."
 #else
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifdef __UINT8_TYPE__
 typedef __UINT8_TYPE__ uint8_t;
@@ -82,12 +86,13 @@ typedef __UINTMAX_TYPE__ uintmax_t;
 typedef __INTMAX_TYPE__ intmax_t;
 
 /* Workaround: Clang 6 to 19, all targets: it does not define __INT8_C() and
- * the others, only the suffixes that they append, which GCC does not define.
- */
+   the others, only the suffixes that they append, which GCC does not
+   define. */
 #ifndef __INTMAX_C
 #   ifndef __FREESTANDING_C_HDRS_C_JOIN
 #       define __FREESTANDING_C_HDRS_C_EXPAND_JOIN(x, suffix) x ## suffix
-#       define __FREESTANDING_C_HDRS_C_JOIN(x, suffix) __FREESTANDING_C_HDRS_C_EXPAND_JOIN(x, suffix)
+#       define __FREESTANDING_C_HDRS_C_JOIN(x, suffix) \
+            __FREESTANDING_C_HDRS_C_EXPAND_JOIN(x, suffix)
 #   endif
 
 #   undef INT8_C
@@ -265,18 +270,16 @@ typedef __INTMAX_TYPE__ intmax_t;
 #undef PTRDIFF_MIN
 #define PTRDIFF_MIN (-PTRDIFF_MAX - 1)
 
-/* SIG_ATOMIC_MIN, SIG_ATOMIC_MAX and SIG_ATOMIC_WIDTH are left out. They are
- * the limits of sig_atomic_t, which <signal.h> declares for the objects that
- * signal handlers use, and only a hosted environment has signals.
- */
+/* SIG_ATOMIC_MIN, SIG_ATOMIC_MAX, and SIG_ATOMIC_WIDTH are left out. They are
+   the limits of sig_atomic_t, which <signal.h> declares for the objects that
+   signal handlers use, and only a hosted environment has signals. */
 
 #undef SIZE_MAX
 #define SIZE_MAX __SIZE_MAX__
 
 /* Workaround: Clang 6 to 22, all targets: it does not tell the minimums of
- * wchar_t and wint_t, only whether they are unsigned, which GCC does not tell,
- * and the minimums of the unsigned types are 0 of their promoted types.
- */
+   wchar_t and wint_t, only whether they are unsigned, which GCC does not tell,
+   and the minimums of the unsigned types are 0 of their promoted types. */
 #undef WCHAR_MAX
 #define WCHAR_MAX __WCHAR_MAX__
 #undef WCHAR_MIN
@@ -300,102 +303,105 @@ typedef __INTMAX_TYPE__ intmax_t;
 #endif
 
 #if __FREESTANDING_C_HDRS_STDINT_REVISION >= 202311L
+#   ifdef __INT8_TYPE__
+#       undef INT8_WIDTH
+#       define INT8_WIDTH 8
+#   endif
+#   ifdef __UINT8_TYPE__
+#       undef UINT8_WIDTH
+#       define UINT8_WIDTH 8
+#   endif
+#   ifdef __INT16_TYPE__
+#       undef INT16_WIDTH
+#       define INT16_WIDTH 16
+#   endif
+#   ifdef __UINT16_TYPE__
+#       undef UINT16_WIDTH
+#       define UINT16_WIDTH 16
+#   endif
+#   ifdef __INT32_TYPE__
+#       undef INT32_WIDTH
+#       define INT32_WIDTH 32
+#   endif
+#   ifdef __UINT32_TYPE__
+#       undef UINT32_WIDTH
+#       define UINT32_WIDTH 32
+#   endif
+#   ifdef __INT64_TYPE__
+#       undef INT64_WIDTH
+#       define INT64_WIDTH 64
+#   endif
+#   ifdef __UINT64_TYPE__
+#       undef UINT64_WIDTH
+#       define UINT64_WIDTH 64
+#   endif
 
-#ifdef __INT8_TYPE__
-#   undef INT8_WIDTH
-#   define INT8_WIDTH 8
-#endif
-#ifdef __UINT8_TYPE__
-#   undef UINT8_WIDTH
-#   define UINT8_WIDTH 8
-#endif
-#ifdef __INT16_TYPE__
-#   undef INT16_WIDTH
-#   define INT16_WIDTH 16
-#endif
-#ifdef __UINT16_TYPE__
-#   undef UINT16_WIDTH
-#   define UINT16_WIDTH 16
-#endif
-#ifdef __INT32_TYPE__
-#   undef INT32_WIDTH
-#   define INT32_WIDTH 32
-#endif
-#ifdef __UINT32_TYPE__
-#   undef UINT32_WIDTH
-#   define UINT32_WIDTH 32
-#endif
-#ifdef __INT64_TYPE__
-#   undef INT64_WIDTH
-#   define INT64_WIDTH 64
-#endif
-#ifdef __UINT64_TYPE__
-#   undef UINT64_WIDTH
-#   define UINT64_WIDTH 64
+#   undef INT_LEAST8_WIDTH
+#   define INT_LEAST8_WIDTH __INT_LEAST8_WIDTH__
+#   undef UINT_LEAST8_WIDTH
+#   define UINT_LEAST8_WIDTH __INT_LEAST8_WIDTH__
+#   undef INT_LEAST16_WIDTH
+#   define INT_LEAST16_WIDTH __INT_LEAST16_WIDTH__
+#   undef UINT_LEAST16_WIDTH
+#   define UINT_LEAST16_WIDTH __INT_LEAST16_WIDTH__
+#   undef INT_LEAST32_WIDTH
+#   define INT_LEAST32_WIDTH __INT_LEAST32_WIDTH__
+#   undef UINT_LEAST32_WIDTH
+#   define UINT_LEAST32_WIDTH __INT_LEAST32_WIDTH__
+#   undef INT_LEAST64_WIDTH
+#   define INT_LEAST64_WIDTH __INT_LEAST64_WIDTH__
+#   undef UINT_LEAST64_WIDTH
+#   define UINT_LEAST64_WIDTH __INT_LEAST64_WIDTH__
+
+#   undef INT_FAST8_WIDTH
+#   define INT_FAST8_WIDTH __INT_FAST8_WIDTH__
+#   undef UINT_FAST8_WIDTH
+#   define UINT_FAST8_WIDTH __INT_FAST8_WIDTH__
+#   undef INT_FAST16_WIDTH
+#   define INT_FAST16_WIDTH __INT_FAST16_WIDTH__
+#   undef UINT_FAST16_WIDTH
+#   define UINT_FAST16_WIDTH __INT_FAST16_WIDTH__
+#   undef INT_FAST32_WIDTH
+#   define INT_FAST32_WIDTH __INT_FAST32_WIDTH__
+#   undef UINT_FAST32_WIDTH
+#   define UINT_FAST32_WIDTH __INT_FAST32_WIDTH__
+#   undef INT_FAST64_WIDTH
+#   define INT_FAST64_WIDTH __INT_FAST64_WIDTH__
+#   undef UINT_FAST64_WIDTH
+#   define UINT_FAST64_WIDTH __INT_FAST64_WIDTH__
+
+#   ifdef __INTPTR_TYPE__
+#       undef INTPTR_WIDTH
+#       define INTPTR_WIDTH __INTPTR_WIDTH__
+#   endif
+#   ifdef __UINTPTR_TYPE__
+#       undef UINTPTR_WIDTH
+#       define UINTPTR_WIDTH __INTPTR_WIDTH__
+#   endif
+
+#   undef INTMAX_WIDTH
+#   define INTMAX_WIDTH __INTMAX_WIDTH__
+#   undef UINTMAX_WIDTH
+#   define UINTMAX_WIDTH __INTMAX_WIDTH__
+
+#   undef PTRDIFF_WIDTH
+#   define PTRDIFF_WIDTH __PTRDIFF_WIDTH__
+
+#   undef SIZE_WIDTH
+#   define SIZE_WIDTH __SIZE_WIDTH__
+
+#   undef WCHAR_WIDTH
+#   define WCHAR_WIDTH __WCHAR_WIDTH__
+
+#   undef WINT_WIDTH
+#   define WINT_WIDTH __WINT_WIDTH__
+
+#   undef __STDC_VERSION_STDINT_H__
+#   define __STDC_VERSION_STDINT_H__ 202311L
 #endif
 
-#undef INT_LEAST8_WIDTH
-#define INT_LEAST8_WIDTH __INT_LEAST8_WIDTH__
-#undef UINT_LEAST8_WIDTH
-#define UINT_LEAST8_WIDTH __INT_LEAST8_WIDTH__
-#undef INT_LEAST16_WIDTH
-#define INT_LEAST16_WIDTH __INT_LEAST16_WIDTH__
-#undef UINT_LEAST16_WIDTH
-#define UINT_LEAST16_WIDTH __INT_LEAST16_WIDTH__
-#undef INT_LEAST32_WIDTH
-#define INT_LEAST32_WIDTH __INT_LEAST32_WIDTH__
-#undef UINT_LEAST32_WIDTH
-#define UINT_LEAST32_WIDTH __INT_LEAST32_WIDTH__
-#undef INT_LEAST64_WIDTH
-#define INT_LEAST64_WIDTH __INT_LEAST64_WIDTH__
-#undef UINT_LEAST64_WIDTH
-#define UINT_LEAST64_WIDTH __INT_LEAST64_WIDTH__
-
-#undef INT_FAST8_WIDTH
-#define INT_FAST8_WIDTH __INT_FAST8_WIDTH__
-#undef UINT_FAST8_WIDTH
-#define UINT_FAST8_WIDTH __INT_FAST8_WIDTH__
-#undef INT_FAST16_WIDTH
-#define INT_FAST16_WIDTH __INT_FAST16_WIDTH__
-#undef UINT_FAST16_WIDTH
-#define UINT_FAST16_WIDTH __INT_FAST16_WIDTH__
-#undef INT_FAST32_WIDTH
-#define INT_FAST32_WIDTH __INT_FAST32_WIDTH__
-#undef UINT_FAST32_WIDTH
-#define UINT_FAST32_WIDTH __INT_FAST32_WIDTH__
-#undef INT_FAST64_WIDTH
-#define INT_FAST64_WIDTH __INT_FAST64_WIDTH__
-#undef UINT_FAST64_WIDTH
-#define UINT_FAST64_WIDTH __INT_FAST64_WIDTH__
-
-#ifdef __INTPTR_TYPE__
-#   undef INTPTR_WIDTH
-#   define INTPTR_WIDTH __INTPTR_WIDTH__
-#endif
-#ifdef __UINTPTR_TYPE__
-#   undef UINTPTR_WIDTH
-#   define UINTPTR_WIDTH __INTPTR_WIDTH__
-#endif
-
-#undef INTMAX_WIDTH
-#define INTMAX_WIDTH __INTMAX_WIDTH__
-#undef UINTMAX_WIDTH
-#define UINTMAX_WIDTH __INTMAX_WIDTH__
-
-#undef PTRDIFF_WIDTH
-#define PTRDIFF_WIDTH __PTRDIFF_WIDTH__
-
-#undef SIZE_WIDTH
-#define SIZE_WIDTH __SIZE_WIDTH__
-
-#undef WCHAR_WIDTH
-#define WCHAR_WIDTH __WCHAR_WIDTH__
-
-#undef WINT_WIDTH
-#define WINT_WIDTH __WINT_WIDTH__
-
-#undef __STDC_VERSION_STDINT_H__
-#define __STDC_VERSION_STDINT_H__ 202311L
+#ifdef __cplusplus
+}
 #endif
 
 #ifdef __cplusplus

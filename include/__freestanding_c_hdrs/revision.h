@@ -14,77 +14,75 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 /* The revision of C whose contents each header has, as
- * __FREESTANDING_C_HDRS_<NAME>_REVISION, which the headers include this
- * for: in C, the revision in use, and in C++, what freestanding-cxx-hdrs,
- * which has all that C++ makes of the headers, tells. Where it is missing,
- * the error below comes before that of its include, which ends the
- * compilation.
- */
-
+   __FREESTANDING_C_HDRS_<NAME>_REVISION, which the headers include this for:
+   in C, the revision in use, and in C++, what freestanding-cxx-hdrs, which has
+   all that C++ makes of the headers, tells. Where it is missing, the error
+   below comes before that of its include, which ends the compilation. */
 #ifndef __FREESTANDING_C_HDRS_REVISION_H
 #define __FREESTANDING_C_HDRS_REVISION_H 1
 
 #pragma GCC system_header
 
 #ifdef __cplusplus
-
-#if defined(__has_include)
-#  if !__has_include(<__fcxx/c_revision.h>)
-#    error "The C headers require freestanding-cxx-hdrs in C++"
-#  endif
-#endif
-#include <__fcxx/c_revision.h>
-
+#   if defined(__has_include)
+#       if !__has_include(<__fcxx/c_revision.h>)
+#           error "The C headers require freestanding-cxx-hdrs in C++."
+#       endif
+#   endif
+#   include <__fcxx/c_revision.h>
 #else
-
-/* The oldest compilers that the headers support: GCC 4.8, and Clang 6, the
- * first to define __WINT_MAX__.
- */
-#if (defined(__clang__) && __clang_major__ < 6) \
- || (!defined(__clang__) \
-     && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8)))
-#  error "The C headers require GCC 4.8 or later, or Clang 6 or later"
+    /* The oldest compilers that the headers support: GCC 4.8, and Clang 6, the
+       first to define __WINT_MAX__. */
+#   if (defined(__clang__) && __clang_major__ < 6) \
+    || (!defined(__clang__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8)))
+#       error "The C headers require GCC 4.8 or later, or Clang 6 or later."
+#   endif
 #endif
 
-/* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23 mode
- * reports 202000L, the value they give the drafts of C23.
- */
-#if defined(__STDC_VERSION__) \
- && (__STDC_VERSION__ >= 202311L \
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef __cplusplus
+    /* Workaround: GCC 13 to 14, and Clang 16 to 17, all targets: their C23
+       mode reports 202000L, the value they give the drafts of C23. */
+#   if defined(__STDC_VERSION__) \
+    && (__STDC_VERSION__ >= 202311L \
      || (__STDC_VERSION__ > 201710L \
-         && ((defined(__clang__) && __clang_major__ >= 16) \
-             || (!defined(__clang__) && __GNUC__ >= 13))))
-#  define __FREESTANDING_C_HDRS_C 202311L
-#elif defined(__STDC_VERSION__)
-#  define __FREESTANDING_C_HDRS_C __STDC_VERSION__
-#else
-#  define __FREESTANDING_C_HDRS_C 198900L
+      && ((defined(__clang__) && __clang_major__ >= 16) \
+       || (!defined(__clang__) && __GNUC__ >= 13))))
+#       define __FREESTANDING_C_HDRS_C 202311L
+#   elif defined(__STDC_VERSION__)
+#       define __FREESTANDING_C_HDRS_C __STDC_VERSION__
+#   else
+#       define __FREESTANDING_C_HDRS_C 198900L
+#   endif
+
+#   define __FREESTANDING_C_HDRS_FLOAT_REVISION __FREESTANDING_C_HDRS_C
+#   define __FREESTANDING_C_HDRS_ISO646_REVISION __FREESTANDING_C_HDRS_C
+#   define __FREESTANDING_C_HDRS_LIMITS_REVISION __FREESTANDING_C_HDRS_C
+#   define __FREESTANDING_C_HDRS_STDALIGN_REVISION __FREESTANDING_C_HDRS_C
+#   define __FREESTANDING_C_HDRS_STDARG_REVISION __FREESTANDING_C_HDRS_C
+#   define __FREESTANDING_C_HDRS_STDATOMIC_REVISION __FREESTANDING_C_HDRS_C
+#   define __FREESTANDING_C_HDRS_STDBIT_REVISION __FREESTANDING_C_HDRS_C
+#   define __FREESTANDING_C_HDRS_STDCKDINT_REVISION __FREESTANDING_C_HDRS_C
+#   define __FREESTANDING_C_HDRS_STDDEF_REVISION __FREESTANDING_C_HDRS_C
+#   define __FREESTANDING_C_HDRS_STDINT_REVISION __FREESTANDING_C_HDRS_C
+#   define __FREESTANDING_C_HDRS_STDNORETURN_REVISION __FREESTANDING_C_HDRS_C
+
+    /* Workaround: Clang 15, all targets: its C23 mode, which lacks much of
+       C23, has the keywords bool, true, and false. */
+#   if defined(__clang__) && __clang_major__ == 15 && defined(__STDC_VERSION__) \
+    && __STDC_VERSION__ > 201710L
+#       define __FREESTANDING_C_HDRS_STDBOOL_REVISION 202311L
+#   else
+#       define __FREESTANDING_C_HDRS_STDBOOL_REVISION __FREESTANDING_C_HDRS_C
+#   endif
 #endif
 
-#define __FREESTANDING_C_HDRS_FLOAT_REVISION __FREESTANDING_C_HDRS_C
-#define __FREESTANDING_C_HDRS_ISO646_REVISION __FREESTANDING_C_HDRS_C
-#define __FREESTANDING_C_HDRS_LIMITS_REVISION __FREESTANDING_C_HDRS_C
-#define __FREESTANDING_C_HDRS_STDALIGN_REVISION __FREESTANDING_C_HDRS_C
-#define __FREESTANDING_C_HDRS_STDARG_REVISION __FREESTANDING_C_HDRS_C
-#define __FREESTANDING_C_HDRS_STDATOMIC_REVISION __FREESTANDING_C_HDRS_C
-#define __FREESTANDING_C_HDRS_STDBIT_REVISION __FREESTANDING_C_HDRS_C
-#define __FREESTANDING_C_HDRS_STDCKDINT_REVISION __FREESTANDING_C_HDRS_C
-#define __FREESTANDING_C_HDRS_STDDEF_REVISION __FREESTANDING_C_HDRS_C
-#define __FREESTANDING_C_HDRS_STDINT_REVISION __FREESTANDING_C_HDRS_C
-#define __FREESTANDING_C_HDRS_STDNORETURN_REVISION __FREESTANDING_C_HDRS_C
-
-/* Workaround: Clang 15, all targets: its C23 mode, which lacks much of C23,
- * has the keywords bool, true, and false.
- */
-#if defined(__clang__) && __clang_major__ == 15 && defined(__STDC_VERSION__) \
- && __STDC_VERSION__ > 201710L
-#  define __FREESTANDING_C_HDRS_STDBOOL_REVISION 202311L
-#else
-#  define __FREESTANDING_C_HDRS_STDBOOL_REVISION __FREESTANDING_C_HDRS_C
-#endif
-
+#ifdef __cplusplus
+}
 #endif
 
 #endif

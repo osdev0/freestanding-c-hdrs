@@ -21,12 +21,15 @@
 
 #include <__freestanding_c_hdrs/revision.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #undef CHAR_BIT
 #define CHAR_BIT __CHAR_BIT__
 
 /* MB_LEN_MAX is left out. It is the most bytes that a multibyte character has
- * in any of the locales, and only a hosted environment has locales.
- */
+   in any of the locales, and only a hosted environment has locales. */
 
 #undef SCHAR_MAX
 #define SCHAR_MAX __SCHAR_MAX__
@@ -85,22 +88,18 @@
 #define ULONG_MAX (LONG_MAX * 2UL + 1UL)
 
 #if __FREESTANDING_C_HDRS_LIMITS_REVISION >= 199901L
+#   undef LLONG_MAX
+#   define LLONG_MAX __LONG_LONG_MAX__
+#   undef LLONG_MIN
+#   define LLONG_MIN (-LLONG_MAX - 1LL)
 
-#undef LLONG_MAX
-#define LLONG_MAX __LONG_LONG_MAX__
-#undef LLONG_MIN
-#define LLONG_MIN (-LLONG_MAX - 1LL)
-
-#undef ULLONG_MAX
-#define ULLONG_MAX (LLONG_MAX * 2ULL + 1ULL)
-
+#   undef ULLONG_MAX
+#   define ULLONG_MAX (LLONG_MAX * 2ULL + 1ULL)
 #endif
 
 #if __FREESTANDING_C_HDRS_LIMITS_REVISION >= 202311L
-
-/* C23 has the widths of the character types expand to the same value as
- * CHAR_BIT.
- */
+    /* C23 has the widths of the character types expand to the same value as
+       CHAR_BIT. */
 #   undef CHAR_WIDTH
 #   define CHAR_WIDTH CHAR_BIT
 #   undef SCHAR_WIDTH
@@ -119,34 +118,37 @@
 #   define LONG_WIDTH __LONG_WIDTH__
 #   undef ULONG_WIDTH
 #   define ULONG_WIDTH __LONG_WIDTH__
-/* GCC names the width of long long __LONG_LONG_WIDTH__, as it does its
- * __LONG_LONG_MAX__, and Clang names it __LLONG_WIDTH__.
- */
-#if defined(__clang__)
-#   undef LLONG_WIDTH
-#   define LLONG_WIDTH __LLONG_WIDTH__
-#   undef ULLONG_WIDTH
-#   define ULLONG_WIDTH __LLONG_WIDTH__
-#else
-#   undef LLONG_WIDTH
-#   define LLONG_WIDTH __LONG_LONG_WIDTH__
-#   undef ULLONG_WIDTH
-#   define ULLONG_WIDTH __LONG_LONG_WIDTH__
+    /* GCC names the width of long long __LONG_LONG_WIDTH__, as it does its
+       __LONG_LONG_MAX__, and Clang names it __LLONG_WIDTH__. */
+#   if defined(__clang__)
+#       undef LLONG_WIDTH
+#       define LLONG_WIDTH __LLONG_WIDTH__
+#       undef ULLONG_WIDTH
+#       define ULLONG_WIDTH __LLONG_WIDTH__
+#   else
+#       undef LLONG_WIDTH
+#       define LLONG_WIDTH __LONG_LONG_WIDTH__
+#       undef ULLONG_WIDTH
+#       define ULLONG_WIDTH __LONG_LONG_WIDTH__
+#   endif
+
+#   undef BOOL_MAX
+#   define BOOL_MAX 1
+#   undef BOOL_WIDTH
+#   define BOOL_WIDTH 1
+
+    /* C++26 does not take this one from C23. */
+#   if !defined(__cplusplus) && defined(__BITINT_MAXWIDTH__)
+#       undef BITINT_MAXWIDTH
+#       define BITINT_MAXWIDTH __BITINT_MAXWIDTH__
+#   endif
+
+#   undef __STDC_VERSION_LIMITS_H__
+#   define __STDC_VERSION_LIMITS_H__ 202311L
 #endif
 
-#undef BOOL_MAX
-#define BOOL_MAX 1
-#undef BOOL_WIDTH
-#define BOOL_WIDTH 1
-
-/* C++26 does not take this one from C23. */
-#if !defined(__cplusplus) && defined(__BITINT_MAXWIDTH__)
-#   undef BITINT_MAXWIDTH
-#   define BITINT_MAXWIDTH __BITINT_MAXWIDTH__
-#endif
-
-#undef __STDC_VERSION_LIMITS_H__
-#define __STDC_VERSION_LIMITS_H__ 202311L
+#ifdef __cplusplus
+}
 #endif
 
 #endif

@@ -22,26 +22,30 @@
 #include <__freestanding_c_hdrs/revision.h>
 
 #if __FREESTANDING_C_HDRS_STDATOMIC_REVISION < 201112L
-#  error "<stdatomic.h> requires C11 or C++23 or later"
-/* GCC before 4.9 has no _Atomic, which it does not tell with
- * __STDC_NO_ATOMICS__ either.
- */
+#   error "<stdatomic.h> requires C11 or C++23 or later."
+    /* GCC before 4.9 has no _Atomic, which it does not tell with
+       __STDC_NO_ATOMICS__ either. */
 #elif !defined(__clang__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
-#  error "<stdatomic.h> requires a compiler with _Atomic"
-#elif !defined(__cplusplus)
+#   error "<stdatomic.h> requires a compiler with _Atomic."
+#else
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef __cplusplus
 
 #if __FREESTANDING_C_HDRS_STDATOMIC_REVISION >= 202311L
-#  undef __STDC_VERSION_STDATOMIC_H__
-#  define __STDC_VERSION_STDATOMIC_H__ 202311L
-/* Workaround: Clang 16 to 18, all targets: its C23 mode does not tell whether
- * atomic char8_t is lock-free. In C23, char8_t is unsigned char, so the
- * answer for char applies.
- */
-#  undef ATOMIC_CHAR8_T_LOCK_FREE
-#  define ATOMIC_CHAR8_T_LOCK_FREE __GCC_ATOMIC_CHAR_LOCK_FREE
+#   undef __STDC_VERSION_STDATOMIC_H__
+#   define __STDC_VERSION_STDATOMIC_H__ 202311L
+    /* Workaround: Clang 16 to 18, all targets: its C23 mode does not tell
+       whether atomic char8_t is lock-free. In C23, char8_t is unsigned char,
+       so the answer for char applies. */
+#   undef ATOMIC_CHAR8_T_LOCK_FREE
+#   define ATOMIC_CHAR8_T_LOCK_FREE __GCC_ATOMIC_CHAR_LOCK_FREE
 #else
-#  undef ATOMIC_VAR_INIT
-#  define ATOMIC_VAR_INIT(value) (value)
+#   undef ATOMIC_VAR_INIT
+#   define ATOMIC_VAR_INIT(value) (value)
 #endif
 
 #undef ATOMIC_BOOL_LOCK_FREE
@@ -62,13 +66,12 @@
 #define ATOMIC_LONG_LOCK_FREE __GCC_ATOMIC_LONG_LOCK_FREE
 #undef ATOMIC_LLONG_LOCK_FREE
 /* Workaround: Clang 6 to 14, i386: it tells long long as only sometimes
- * lock-free, as long long is aligned to 4 there, but atomic_llong is aligned
- * to 8, which makes it always lock-free with cmpxchg8b, as GCC tells.
- */
+   lock-free, as long long is aligned to 4 there, but atomic_llong is aligned
+   to 8, which makes it always lock-free with cmpxchg8b, as GCC tells. */
 #if defined(__i386__) && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8)
-#  define ATOMIC_LLONG_LOCK_FREE 2
+#   define ATOMIC_LLONG_LOCK_FREE 2
 #else
-#  define ATOMIC_LLONG_LOCK_FREE __GCC_ATOMIC_LLONG_LOCK_FREE
+#   define ATOMIC_LLONG_LOCK_FREE __GCC_ATOMIC_LLONG_LOCK_FREE
 #endif
 #undef ATOMIC_POINTER_LOCK_FREE
 #define ATOMIC_POINTER_LOCK_FREE __GCC_ATOMIC_POINTER_LOCK_FREE
@@ -143,24 +146,23 @@ typedef _Atomic(__INTMAX_TYPE__) atomic_intmax_t;
 typedef _Atomic(__UINTMAX_TYPE__) atomic_uintmax_t;
 
 /* The orders given to the compare-and-exchanges. On the AVR and the MSP430,
- * whose single core performs the accesses to memory in the order of the
- * program, every order is as strong as seq_cst, so they are given seq_cst
- * there, with every compiler.
- * Workaround: Clang 19 to 23, AVR and MSP430: it crashes selecting the
- * instructions of a compare-and-exchange whose order of failure is known only
- * at run time.
- */
+   whose single core performs the accesses to memory in the order of the
+   program, every order is as strong as seq_cst, so they are given seq_cst
+   there, with every compiler.
+
+   Workaround: Clang 19 to 23, AVR and MSP430: it crashes selecting the
+   instructions of a compare-and-exchange whose order of failure is known only
+   at run time. */
 #if defined(__AVR__) || defined(__MSP430__)
-#  define __FREESTANDING_C_HDRS_CAS_ORDER(order) \
-       ((void)(order), memory_order_seq_cst)
+#   define __FREESTANDING_C_HDRS_CAS_ORDER(order) \
+        ((void)(order), memory_order_seq_cst)
 #else
-#  define __FREESTANDING_C_HDRS_CAS_ORDER(order) (order)
+#   define __FREESTANDING_C_HDRS_CAS_ORDER(order) (order)
 #endif
 
 /* Clang's __atomic builtins reject _Atomic objects, but its __c11_atomic
- * builtins take them. GCC has none of those, but its generic __atomic builtins
- * take _Atomic objects of any type, through pointers.
- */
+   builtins take them. GCC has none of those, but its generic __atomic builtins
+   take _Atomic objects of any type, through pointers. */
 #undef atomic_init
 #undef atomic_is_lock_free
 #undef atomic_store_explicit
@@ -174,190 +176,178 @@ typedef _Atomic(__UINTMAX_TYPE__) atomic_uintmax_t;
 #undef atomic_fetch_xor_explicit
 #undef atomic_fetch_and_explicit
 #ifdef __clang__
-#  define atomic_init(obj, value) __c11_atomic_init((obj), (value))
-/* Workaround: Clang 6 to 10, all targets: its __c11_atomic_is_lock_free
- * yields an int, not a _Bool.
- */
-#  define atomic_is_lock_free(obj) \
-       ((void)(obj), (_Bool)__c11_atomic_is_lock_free(sizeof(*(obj))))
-#  define atomic_store_explicit(obj, desired, order) \
-       __c11_atomic_store((obj), (desired), (order))
-#  define atomic_load_explicit(obj, order) __c11_atomic_load((obj), (order))
-#  define atomic_exchange_explicit(obj, desired, order) \
-       __c11_atomic_exchange((obj), (desired), (order))
-#  define atomic_compare_exchange_strong_explicit(obj, expected, desired, \
-                                                  success, failure) \
-       __c11_atomic_compare_exchange_strong((obj), (expected), (desired), \
-                                            __FREESTANDING_C_HDRS_CAS_ORDER( \
-                                                success), \
-                                            __FREESTANDING_C_HDRS_CAS_ORDER( \
-                                                failure))
-#  define atomic_compare_exchange_weak_explicit(obj, expected, desired, \
-                                                success, failure) \
-       __c11_atomic_compare_exchange_weak((obj), (expected), (desired), \
-                                          __FREESTANDING_C_HDRS_CAS_ORDER( \
-                                              success), \
-                                          __FREESTANDING_C_HDRS_CAS_ORDER( \
-                                              failure))
-#  define atomic_fetch_add_explicit(obj, operand, order) \
-       __c11_atomic_fetch_add((obj), (operand), (order))
-#  define atomic_fetch_sub_explicit(obj, operand, order) \
-       __c11_atomic_fetch_sub((obj), (operand), (order))
-#  define atomic_fetch_or_explicit(obj, operand, order) \
-       __c11_atomic_fetch_or((obj), (operand), (order))
-#  define atomic_fetch_xor_explicit(obj, operand, order) \
-       __c11_atomic_fetch_xor((obj), (operand), (order))
-#  define atomic_fetch_and_explicit(obj, operand, order) \
-       __c11_atomic_fetch_and((obj), (operand), (order))
+#   define atomic_init(obj, value) __c11_atomic_init((obj), (value))
+    /* Workaround: Clang 6 to 10, all targets: its __c11_atomic_is_lock_free
+       yields an int, not a _Bool. */
+#   define atomic_is_lock_free(obj) \
+        ((void)(obj), (_Bool)__c11_atomic_is_lock_free(sizeof(*(obj))))
+#   define atomic_store_explicit(obj, desired, order) \
+        __c11_atomic_store((obj), (desired), (order))
+#   define atomic_load_explicit(obj, order) __c11_atomic_load((obj), (order))
+#   define atomic_exchange_explicit(obj, desired, order) \
+        __c11_atomic_exchange((obj), (desired), (order))
+#   define atomic_compare_exchange_strong_explicit(obj, expected, desired, success, failure) \
+        __c11_atomic_compare_exchange_strong( \
+            (obj), (expected), (desired), __FREESTANDING_C_HDRS_CAS_ORDER(success), \
+            __FREESTANDING_C_HDRS_CAS_ORDER(failure) \
+        )
+#   define atomic_compare_exchange_weak_explicit(obj, expected, desired, success, failure) \
+        __c11_atomic_compare_exchange_weak( \
+            (obj), (expected), (desired), __FREESTANDING_C_HDRS_CAS_ORDER(success), \
+            __FREESTANDING_C_HDRS_CAS_ORDER(failure) \
+        )
+#   define atomic_fetch_add_explicit(obj, operand, order) \
+        __c11_atomic_fetch_add((obj), (operand), (order))
+#   define atomic_fetch_sub_explicit(obj, operand, order) \
+        __c11_atomic_fetch_sub((obj), (operand), (order))
+#   define atomic_fetch_or_explicit(obj, operand, order) \
+        __c11_atomic_fetch_or((obj), (operand), (order))
+#   define atomic_fetch_xor_explicit(obj, operand, order) \
+        __c11_atomic_fetch_xor((obj), (operand), (order))
+#   define atomic_fetch_and_explicit(obj, operand, order) \
+        __c11_atomic_fetch_and((obj), (operand), (order))
 #else
-/* GCC has no builtin that initialises an atomic object, so a relaxed store
- * does it.
- */
-#  define atomic_init(obj, value) \
-       atomic_store_explicit((obj), (value), memory_order_relaxed)
-/* A null pointer asks about the usual alignment of the type, which its atomic
- * objects have.
- */
-#  define atomic_is_lock_free(obj) \
-       ((void)(obj), __atomic_is_lock_free(sizeof(*(obj)), 0))
-#  define atomic_store_explicit(obj, desired, order) \
-       __extension__ ({ \
-           __auto_type __freestanding_c_hdrs_obj = (obj); \
-           __typeof__((void)0, *__freestanding_c_hdrs_obj) \
-               __freestanding_c_hdrs_desired = (desired); \
-           __atomic_store(__freestanding_c_hdrs_obj, \
-                          &__freestanding_c_hdrs_desired, (order)); \
-       })
-#  define atomic_load_explicit(obj, order) \
-       __extension__ ({ \
-           __auto_type __freestanding_c_hdrs_obj = (obj); \
-           __typeof__((void)0, *__freestanding_c_hdrs_obj) \
-               __freestanding_c_hdrs_value; \
-           __atomic_load(__freestanding_c_hdrs_obj, \
-                         &__freestanding_c_hdrs_value, (order)); \
-           __freestanding_c_hdrs_value; \
-       })
-#  define atomic_exchange_explicit(obj, desired, order) \
-       __extension__ ({ \
-           __auto_type __freestanding_c_hdrs_obj = (obj); \
-           __typeof__((void)0, *__freestanding_c_hdrs_obj) \
-               __freestanding_c_hdrs_desired = (desired); \
-           __typeof__((void)0, *__freestanding_c_hdrs_obj) \
-               __freestanding_c_hdrs_value; \
-           __atomic_exchange(__freestanding_c_hdrs_obj, \
-                             &__freestanding_c_hdrs_desired, \
-                             &__freestanding_c_hdrs_value, (order)); \
-           __freestanding_c_hdrs_value; \
-       })
-/* Workaround: GCC 4.9 to 6, all targets: its __atomic_compare_exchange on an
- * object of one byte yields a type that is neither _Bool nor int.
- */
-#  define atomic_compare_exchange_strong_explicit(obj, expected, desired, \
-                                                  success, failure) \
-       __extension__ ({ \
-           __auto_type __freestanding_c_hdrs_obj = (obj); \
-           __typeof__((void)0, *__freestanding_c_hdrs_obj) \
-               __freestanding_c_hdrs_desired = (desired); \
-           (_Bool)__atomic_compare_exchange(__freestanding_c_hdrs_obj, \
-                                            (expected), \
-                                            &__freestanding_c_hdrs_desired, \
-                                            0, \
-                                            __FREESTANDING_C_HDRS_CAS_ORDER( \
-                                                success), \
-                                            __FREESTANDING_C_HDRS_CAS_ORDER( \
-                                                failure)); \
-       })
-#  define atomic_compare_exchange_weak_explicit(obj, expected, desired, \
-                                                success, failure) \
-       __extension__ ({ \
-           __auto_type __freestanding_c_hdrs_obj = (obj); \
-           __typeof__((void)0, *__freestanding_c_hdrs_obj) \
-               __freestanding_c_hdrs_desired = (desired); \
-           (_Bool)__atomic_compare_exchange(__freestanding_c_hdrs_obj, \
-                                            (expected), \
-                                            &__freestanding_c_hdrs_desired, \
-                                            1, \
-                                            __FREESTANDING_C_HDRS_CAS_ORDER( \
-                                                success), \
-                                            __FREESTANDING_C_HDRS_CAS_ORDER( \
-                                                failure)); \
-       })
-/* GCC's __atomic_fetch_add and __atomic_fetch_sub, whose arithmetic wraps
- * around, take the operand of a pointer in bytes, so the macros below scale it
- * by the size of the type pointed to. GCC checks both branches of
- * __builtin_choose_expr, so for integers the size taken is that of a char.
- */
-#  define __FREESTANDING_C_HDRS_IS_POINTER(obj) \
-       (__builtin_classify_type((__typeof__((void)0, *(obj)))0) == 5)
-#  define __FREESTANDING_C_HDRS_OPERAND(obj, operand) \
-       __builtin_choose_expr(__FREESTANDING_C_HDRS_IS_POINTER(obj), \
-           (__PTRDIFF_TYPE__)(operand) \
-               * sizeof(*__builtin_choose_expr( \
-                   __FREESTANDING_C_HDRS_IS_POINTER(obj), \
-                   (__typeof__((void)0, *(obj)))0, (char *)0)), \
-           (operand))
-#  define atomic_fetch_add_explicit(obj, operand, order) \
-       __extension__ ({ \
-           __auto_type __freestanding_c_hdrs_obj = (obj); \
-           __atomic_fetch_add(__freestanding_c_hdrs_obj, \
-                              __FREESTANDING_C_HDRS_OPERAND( \
-                                  __freestanding_c_hdrs_obj, operand), \
-                              (order)); \
-       })
-#  define atomic_fetch_sub_explicit(obj, operand, order) \
-       __extension__ ({ \
-           __auto_type __freestanding_c_hdrs_obj = (obj); \
-           __atomic_fetch_sub(__freestanding_c_hdrs_obj, \
-                              __FREESTANDING_C_HDRS_OPERAND( \
-                                  __freestanding_c_hdrs_obj, operand), \
-                              (order)); \
-       })
-#  define atomic_fetch_or_explicit(obj, operand, order) \
-       __atomic_fetch_or((obj), (operand), (order))
-#  define atomic_fetch_xor_explicit(obj, operand, order) \
-       __atomic_fetch_xor((obj), (operand), (order))
-#  define atomic_fetch_and_explicit(obj, operand, order) \
-       __atomic_fetch_and((obj), (operand), (order))
+    /* GCC has no builtin that initialises an atomic object, so a relaxed store
+       does it. */
+#   define atomic_init(obj, value) \
+        atomic_store_explicit((obj), (value), memory_order_relaxed)
+    /* A null pointer asks about the usual alignment of the type, which its
+       atomic objects have. */
+#   define atomic_is_lock_free(obj) \
+        ((void)(obj), __atomic_is_lock_free(sizeof(*(obj)), 0))
+#   define atomic_store_explicit(obj, desired, order) __extension__ ({ \
+        __auto_type __freestanding_c_hdrs_obj = (obj); \
+        __typeof__((void)0, *__freestanding_c_hdrs_obj) \
+            __freestanding_c_hdrs_desired = (desired); \
+        __atomic_store(__freestanding_c_hdrs_obj, &__freestanding_c_hdrs_desired, (order)); \
+    })
+#   define atomic_load_explicit(obj, order) __extension__ ({ \
+        __auto_type __freestanding_c_hdrs_obj = (obj); \
+        __typeof__((void)0, *__freestanding_c_hdrs_obj) __freestanding_c_hdrs_value; \
+        __atomic_load(__freestanding_c_hdrs_obj, &__freestanding_c_hdrs_value, (order)); \
+        __freestanding_c_hdrs_value; \
+    })
+#   define atomic_exchange_explicit(obj, desired, order) __extension__ ({ \
+        __auto_type __freestanding_c_hdrs_obj = (obj); \
+        __typeof__((void)0, *__freestanding_c_hdrs_obj) \
+            __freestanding_c_hdrs_desired = (desired); \
+        __typeof__((void)0, *__freestanding_c_hdrs_obj) __freestanding_c_hdrs_value; \
+        __atomic_exchange( \
+            __freestanding_c_hdrs_obj, &__freestanding_c_hdrs_desired, \
+            &__freestanding_c_hdrs_value, (order) \
+        ); \
+        __freestanding_c_hdrs_value; \
+    })
+    /* Workaround: GCC 4.9 to 6, all targets: its __atomic_compare_exchange on
+       an object of one byte yields a type that is neither _Bool nor int. */
+#   define atomic_compare_exchange_strong_explicit( \
+        obj, \
+        expected, \
+        desired, \
+        success, \
+        failure \
+    ) __extension__ ({ \
+        __auto_type __freestanding_c_hdrs_obj = (obj); \
+        __typeof__((void)0, *__freestanding_c_hdrs_obj) \
+            __freestanding_c_hdrs_desired = (desired); \
+        (_Bool)__atomic_compare_exchange( \
+            __freestanding_c_hdrs_obj, (expected), &__freestanding_c_hdrs_desired, 0, \
+            __FREESTANDING_C_HDRS_CAS_ORDER(success), __FREESTANDING_C_HDRS_CAS_ORDER(failure) \
+        ); \
+    })
+#   define atomic_compare_exchange_weak_explicit( \
+        obj, \
+        expected, \
+        desired, \
+        success, \
+        failure \
+    ) __extension__ ({ \
+        __auto_type __freestanding_c_hdrs_obj = (obj); \
+        __typeof__((void)0, *__freestanding_c_hdrs_obj) \
+            __freestanding_c_hdrs_desired = (desired); \
+        (_Bool)__atomic_compare_exchange( \
+            __freestanding_c_hdrs_obj, (expected), &__freestanding_c_hdrs_desired, 1, \
+            __FREESTANDING_C_HDRS_CAS_ORDER(success), __FREESTANDING_C_HDRS_CAS_ORDER(failure) \
+        ); \
+    })
+    /* GCC's __atomic_fetch_add and __atomic_fetch_sub, whose arithmetic wraps
+       around, take the operand of a pointer in bytes, so the macros below
+       scale it by the size of the type pointed to. GCC checks both branches of
+       __builtin_choose_expr, so for integers the size taken is that of a
+       char. */
+#   define __FREESTANDING_C_HDRS_IS_POINTER(obj) \
+        (__builtin_classify_type((__typeof__((void)0, *(obj)))0) == 5)
+#   define __FREESTANDING_C_HDRS_SCALE_POINTER(obj) \
+        __builtin_choose_expr( \
+            __FREESTANDING_C_HDRS_IS_POINTER(obj), (__typeof__((void)0, *(obj)))0, (char *)0 \
+        )
+#   define __FREESTANDING_C_HDRS_OPERAND(obj, operand) \
+        __builtin_choose_expr( \
+            __FREESTANDING_C_HDRS_IS_POINTER(obj), \
+            (__PTRDIFF_TYPE__)(operand) * sizeof(*__FREESTANDING_C_HDRS_SCALE_POINTER(obj)), \
+            (operand) \
+        )
+#   define atomic_fetch_add_explicit(obj, operand, order) __extension__ ({ \
+        __auto_type __freestanding_c_hdrs_obj = (obj); \
+        __atomic_fetch_add( \
+            __freestanding_c_hdrs_obj, \
+            __FREESTANDING_C_HDRS_OPERAND(__freestanding_c_hdrs_obj, operand), \
+            (order) \
+        ); \
+    })
+#   define atomic_fetch_sub_explicit(obj, operand, order) __extension__ ({ \
+        __auto_type __freestanding_c_hdrs_obj = (obj); \
+        __atomic_fetch_sub( \
+            __freestanding_c_hdrs_obj, \
+            __FREESTANDING_C_HDRS_OPERAND(__freestanding_c_hdrs_obj, operand), \
+            (order) \
+        ); \
+    })
+#   define atomic_fetch_or_explicit(obj, operand, order) \
+        __atomic_fetch_or((obj), (operand), (order))
+#   define atomic_fetch_xor_explicit(obj, operand, order) \
+        __atomic_fetch_xor((obj), (operand), (order))
+#   define atomic_fetch_and_explicit(obj, operand, order) \
+        __atomic_fetch_and((obj), (operand), (order))
 #endif
 
 #undef atomic_store
 #define atomic_store(obj, desired) \
-     atomic_store_explicit((obj), (desired), memory_order_seq_cst)
+    atomic_store_explicit((obj), (desired), memory_order_seq_cst)
 #undef atomic_load
 #define atomic_load(obj) atomic_load_explicit((obj), memory_order_seq_cst)
 #undef atomic_exchange
 #define atomic_exchange(obj, desired) \
-     atomic_exchange_explicit((obj), (desired), memory_order_seq_cst)
+    atomic_exchange_explicit((obj), (desired), memory_order_seq_cst)
 #undef atomic_compare_exchange_strong
 #define atomic_compare_exchange_strong(obj, expected, desired) \
-     atomic_compare_exchange_strong_explicit((obj), (expected), (desired), \
-                                             memory_order_seq_cst, \
-                                             memory_order_seq_cst)
+    atomic_compare_exchange_strong_explicit( \
+        (obj), (expected), (desired), memory_order_seq_cst, memory_order_seq_cst \
+    )
 #undef atomic_compare_exchange_weak
 #define atomic_compare_exchange_weak(obj, expected, desired) \
-     atomic_compare_exchange_weak_explicit((obj), (expected), (desired), \
-                                           memory_order_seq_cst, \
-                                           memory_order_seq_cst)
+    atomic_compare_exchange_weak_explicit( \
+        (obj), (expected), (desired), memory_order_seq_cst, memory_order_seq_cst \
+    )
 #undef atomic_fetch_add
 #define atomic_fetch_add(obj, operand) \
-     atomic_fetch_add_explicit((obj), (operand), memory_order_seq_cst)
+    atomic_fetch_add_explicit((obj), (operand), memory_order_seq_cst)
 #undef atomic_fetch_sub
 #define atomic_fetch_sub(obj, operand) \
-     atomic_fetch_sub_explicit((obj), (operand), memory_order_seq_cst)
+    atomic_fetch_sub_explicit((obj), (operand), memory_order_seq_cst)
 #undef atomic_fetch_or
 #define atomic_fetch_or(obj, operand) \
-     atomic_fetch_or_explicit((obj), (operand), memory_order_seq_cst)
+    atomic_fetch_or_explicit((obj), (operand), memory_order_seq_cst)
 #undef atomic_fetch_xor
 #define atomic_fetch_xor(obj, operand) \
-     atomic_fetch_xor_explicit((obj), (operand), memory_order_seq_cst)
+    atomic_fetch_xor_explicit((obj), (operand), memory_order_seq_cst)
 #undef atomic_fetch_and
 #define atomic_fetch_and(obj, operand) \
-     atomic_fetch_and_explicit((obj), (operand), memory_order_seq_cst)
+    atomic_fetch_and_explicit((obj), (operand), memory_order_seq_cst)
 
 /* C makes these functions: a program that takes their addresses or suppresses
- * their macros links with a library that defines them. The macros below use
- * builtins, and need no library.
- */
+   their macros links with a library that defines them. The macros below use
+   builtins, and need no library. */
 void atomic_thread_fence(memory_order);
 void atomic_signal_fence(memory_order);
 _Bool atomic_flag_test_and_set(volatile atomic_flag *);
@@ -368,43 +358,48 @@ void atomic_flag_clear_explicit(volatile atomic_flag *, memory_order);
 #undef atomic_thread_fence
 #undef atomic_signal_fence
 /* On the AVR and the MSP430, whose single core performs the accesses to memory
- * in the order of the program, and whose only other threads are the interrupt
- * handlers, a fence needs to be no more than a barrier to the compiler, which
- * is what it is there, with every compiler.
- * Workaround: Clang 6 to 23, MSP430: it cannot select any fence.
- */
+   in the order of the program, and whose only other threads are the interrupt
+   handlers, a fence needs to be no more than a barrier to the compiler, which
+   is what it is there, with every compiler.
+
+   Workaround: Clang 6 to 23, MSP430: it cannot select any fence. */
 #if defined(__AVR__) || defined(__MSP430__)
-#  define __FREESTANDING_C_HDRS_FENCE(order) \
-       __extension__ ({ \
-           if ((order) != memory_order_relaxed) { \
-               __asm__ __volatile__("" ::: "memory"); \
-           } \
-       })
-#  define atomic_thread_fence(order) __FREESTANDING_C_HDRS_FENCE(order)
-#  define atomic_signal_fence(order) __FREESTANDING_C_HDRS_FENCE(order)
+#   define __FREESTANDING_C_HDRS_FENCE(order) __extension__ ({ \
+        if ((order) != memory_order_relaxed) { \
+            __asm__ volatile ("" ::: "memory"); \
+        } \
+    })
+#   define atomic_thread_fence(order) __FREESTANDING_C_HDRS_FENCE(order)
+#   define atomic_signal_fence(order) __FREESTANDING_C_HDRS_FENCE(order)
 #elif defined(__clang__)
-#  define atomic_thread_fence(order) __c11_atomic_thread_fence((order))
-#  define atomic_signal_fence(order) __c11_atomic_signal_fence((order))
+#   define atomic_thread_fence(order) __c11_atomic_thread_fence((order))
+#   define atomic_signal_fence(order) __c11_atomic_signal_fence((order))
 #else
-#  define atomic_thread_fence(order) __atomic_thread_fence((order))
-#  define atomic_signal_fence(order) __atomic_signal_fence((order))
+#   define atomic_thread_fence(order) __atomic_thread_fence((order))
+#   define atomic_signal_fence(order) __atomic_signal_fence((order))
 #endif
 #undef atomic_flag_test_and_set_explicit
 #define atomic_flag_test_and_set_explicit(obj, order) \
-     __atomic_test_and_set(&(obj)->__freestanding_c_hdrs_state, (order))
+    __atomic_test_and_set(&(obj)->__freestanding_c_hdrs_state, (order))
 #undef atomic_flag_test_and_set
 #define atomic_flag_test_and_set(obj) \
-     atomic_flag_test_and_set_explicit((obj), memory_order_seq_cst)
+    atomic_flag_test_and_set_explicit((obj), memory_order_seq_cst)
 #undef atomic_flag_clear_explicit
 #define atomic_flag_clear_explicit(obj, order) \
-     __atomic_clear(&(obj)->__freestanding_c_hdrs_state, (order))
+    __atomic_clear(&(obj)->__freestanding_c_hdrs_state, (order))
 #undef atomic_flag_clear
 #define atomic_flag_clear(obj) \
-     atomic_flag_clear_explicit((obj), memory_order_seq_cst)
+    atomic_flag_clear_explicit((obj), memory_order_seq_cst)
 
-#else
+#endif
 
-#include <__fcxx/c_stdatomic.h>
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+#   include <__fcxx/c_stdatomic.h>
+#endif
 
 #endif
 

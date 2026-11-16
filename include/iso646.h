@@ -22,35 +22,41 @@
 #include <__freestanding_c_hdrs/revision.h>
 
 #if __FREESTANDING_C_HDRS_ISO646_REVISION < 199409L
-#  error "<iso646.h> requires C95 or later"
+#   error "<iso646.h> requires C95 or later."
 #else
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* C++ has these names as operators. */
 #ifndef __cplusplus
+#   undef and
+#   define and &&
+#   undef and_eq
+#   define and_eq &=
+#   undef bitand
+#   define bitand &
+#   undef bitor
+#   define bitor |
+#   undef compl
+#   define compl ~
+#   undef not
+#   define not !
+#   undef not_eq
+#   define not_eq !=
+#   undef or
+#   define or ||
+#   undef or_eq
+#   define or_eq |=
+#   undef xor
+#   define xor ^
+#   undef xor_eq
+#   define xor_eq ^=
+#endif
 
-#undef and
-#define and &&
-#undef and_eq
-#define and_eq &=
-#undef bitand
-#define bitand &
-#undef bitor
-#define bitor |
-#undef compl
-#define compl ~
-#undef not
-#define not !
-#undef not_eq
-#define not_eq !=
-#undef or
-#define or ||
-#undef or_eq
-#define or_eq |=
-#undef xor
-#define xor ^
-#undef xor_eq
-#define xor_eq ^=
-
+#ifdef __cplusplus
+}
 #endif
 
 #endif

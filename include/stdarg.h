@@ -21,43 +21,50 @@
 
 #include <__freestanding_c_hdrs/revision.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef __builtin_va_list va_list;
 
 #undef va_start
 #if __FREESTANDING_C_HDRS_STDARG_REVISION >= 202311L
-/* The builtin of C23 diagnoses unexpected arguments, as C23 recommends. */
-#  if __has_builtin(__builtin_c23_va_start)
-#    define va_start(...) __builtin_c23_va_start(__VA_ARGS__)
-#  elif defined(__clang__) && __clang_major__ < 19
-/* Workaround: Clang 16 to 18, all targets: -Wpedantic warns, in the code of
- * the program, that va_start(ap) leaves out the variadic arguments, so they
- * go to another macro, with one more, which expands the macros of any
- * further arguments, which C23 leaves alone.
- */
-#    define va_start(...) __FREESTANDING_C_HDRS_VA_START(__VA_ARGS__, 0)
-#    define __FREESTANDING_C_HDRS_VA_START(v, ...) __builtin_va_start(v, 0)
-#  else
-#    define va_start(v, ...) __builtin_va_start(v, 0)
-#  endif
+    /* The builtin of C23 diagnoses unexpected arguments, as C23 recommends. */
+#   if __has_builtin(__builtin_c23_va_start)
+#       define va_start(...) __builtin_c23_va_start(__VA_ARGS__)
+#   elif defined(__clang__) && __clang_major__ < 19
+        /* Workaround: Clang 16 to 18, all targets: -Wpedantic warns, in the
+           code of the program, that va_start(ap) leaves out the variadic
+           arguments, so they go to another macro, with one more, which expands
+           the macros of any further arguments, which C23 leaves alone. */
+#       define va_start(...) __FREESTANDING_C_HDRS_VA_START(__VA_ARGS__, 0)
+#       define __FREESTANDING_C_HDRS_VA_START(v, ...) __builtin_va_start(v, 0)
+#   else
+#       define va_start(v, ...) __builtin_va_start(v, 0)
+#   endif
 #else
-#  define va_start(v, l) __builtin_va_start(v, l)
+#   define va_start(v, l) __builtin_va_start(v, l)
 #endif
 #undef va_end
 #define va_end(v) __builtin_va_end(v)
 #undef va_arg
 #define va_arg(v, l) __builtin_va_arg(v, l)
 #if __FREESTANDING_C_HDRS_STDARG_REVISION >= 199901L
-#  undef va_copy
-#  define va_copy(d, s) __builtin_va_copy(d, s)
+#   undef va_copy
+#   define va_copy(d, s) __builtin_va_copy(d, s)
 #endif
 
 #if __FREESTANDING_C_HDRS_STDARG_REVISION >= 202311L
-#  undef __STDC_VERSION_STDARG_H__
-#  define __STDC_VERSION_STDARG_H__ 202311L
+#   undef __STDC_VERSION_STDARG_H__
+#   define __STDC_VERSION_STDARG_H__ 202311L
 #endif
 
 #ifdef __cplusplus
-#  include <__fcxx/c_stdarg.h>
+}
+#endif
+
+#ifdef __cplusplus
+#   include <__fcxx/c_stdarg.h>
 #endif
 
 #endif

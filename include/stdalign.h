@@ -22,25 +22,33 @@
 #include <__freestanding_c_hdrs/revision.h>
 
 #if __FREESTANDING_C_HDRS_STDALIGN_REVISION < 201112L
-#  error "<stdalign.h> requires C11 or C++11 or later"
+#   error "<stdalign.h> requires C11 or C++11 or later."
 #else
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if __FREESTANDING_C_HDRS_STDALIGN_REVISION >= 202311L
     /* These do not need to be defined for C23+. */
 #else
-#  undef alignas
-#  define alignas _Alignas
-#  undef alignof
-#  define alignof _Alignof
+#   undef alignas
+#   define alignas _Alignas
+#   undef alignof
+#   define alignof _Alignof
 
-#  undef __alignas_is_defined
-#  define __alignas_is_defined 1
-#  undef __alignof_is_defined
-#  define __alignof_is_defined 1
+#   undef __alignas_is_defined
+#   define __alignas_is_defined 1
+#   undef __alignof_is_defined
+#   define __alignof_is_defined 1
 #endif
 
 #ifdef __cplusplus
-#  include <__fcxx/c_stdalign.h>
+}
+#endif
+
+#ifdef __cplusplus
+#   include <__fcxx/c_stdalign.h>
 #endif
 
 #endif

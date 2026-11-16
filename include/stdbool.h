@@ -22,23 +22,31 @@
 #include <__freestanding_c_hdrs/revision.h>
 
 #if __FREESTANDING_C_HDRS_STDBOOL_REVISION < 199901L
-#  error "<stdbool.h> requires C99 or C++11 or later"
+#   error "<stdbool.h> requires C99 or C++11 or later."
 #else
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if __FREESTANDING_C_HDRS_STDBOOL_REVISION >= 202311L
     /* These do not need to be defined for C23+. */
 #else
-#  undef bool
-#  define bool _Bool
+#   undef bool
+#   define bool _Bool
 
-#  undef true
-#  define true 1
-#  undef false
-#  define false 0
+#   undef true
+#   define true 1
+#   undef false
+#   define false 0
 #endif
 
 #undef __bool_true_false_are_defined
 #define __bool_true_false_are_defined 1
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

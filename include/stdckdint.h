@@ -22,25 +22,31 @@
 #include <__freestanding_c_hdrs/revision.h>
 
 #if __FREESTANDING_C_HDRS_STDCKDINT_REVISION < 202311L
-#  error "<stdckdint.h> requires C23 or C++26 or later"
+#   error "<stdckdint.h> requires C23 or C++26 or later."
 #else
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #undef __STDC_VERSION_STDCKDINT_H__
 #define __STDC_VERSION_STDCKDINT_H__ 202311L
 
 #ifndef __cplusplus
+#   undef ckd_add
+#   define ckd_add(result, a, b) (__builtin_add_overflow((a), (b), (result)))
+#   undef ckd_sub
+#   define ckd_sub(result, a, b) (__builtin_sub_overflow((a), (b), (result)))
+#   undef ckd_mul
+#   define ckd_mul(result, a, b) (__builtin_mul_overflow((a), (b), (result)))
+#endif
 
-#undef ckd_add
-#define ckd_add(result, a, b) (__builtin_add_overflow((a), (b), (result)))
-#undef ckd_sub
-#define ckd_sub(result, a, b) (__builtin_sub_overflow((a), (b), (result)))
-#undef ckd_mul
-#define ckd_mul(result, a, b) (__builtin_mul_overflow((a), (b), (result)))
+#ifdef __cplusplus
+}
+#endif
 
-#else
-
-#include <__fcxx/c_stdckdint.h>
-
+#ifdef __cplusplus
+#   include <__fcxx/c_stdckdint.h>
 #endif
 
 #endif
