@@ -97,13 +97,19 @@ typedef __INT_LEAST64_TYPE__ int_least64_t;
     /* GCC before 14 and Clang before 19 have these builtins for unsigned int,
        long, and long long alone: those of unsigned long long, of which the
        types twice as wide, unsigned __int128 and unsigned _BitInt(128), are
-       made of two. */
+       made of two. A width is the number of one bits of the type's maximum, as
+       a bit-precise type may have padding bits (e.g. unsigned _BitInt(96) has
+       32 on x86-64), and the leading zeros leave out the extra bits of the
+       unsigned long long, or of the two, that hold the value. */
 #   define __FREESTANDING_C_HDRS_STDBIT_LLONG \
         ((int)(sizeof(unsigned long long) * __CHAR_BIT__))
 #   define __FREESTANDING_C_HDRS_STDBIT_WIDTH(x) \
-        ((int)(sizeof(x) * __CHAR_BIT__))
+        __FREESTANDING_C_HDRS_STDBIT_POPCOUNT((typeof(x))~(typeof(x))0)
 #   define __FREESTANDING_C_HDRS_STDBIT_WIDE(x) \
         (sizeof(x) > sizeof(unsigned long long))
+#   define __FREESTANDING_C_HDRS_STDBIT_EXTRA(x) \
+        ((__FREESTANDING_C_HDRS_STDBIT_WIDE(x) ? 2 : 1) * __FREESTANDING_C_HDRS_STDBIT_LLONG \
+       - __FREESTANDING_C_HDRS_STDBIT_WIDTH(x))
 #   define __FREESTANDING_C_HDRS_STDBIT_LOW(x) ((unsigned long long)(x))
 #   define __FREESTANDING_C_HDRS_STDBIT_HIGH(x) \
         ((unsigned long long)((x) \
@@ -116,13 +122,14 @@ typedef __INT_LEAST64_TYPE__ int_least64_t;
             __freestanding_c_hdrs_clz = (z); \
         } else if (!__FREESTANDING_C_HDRS_STDBIT_WIDE(x)) { \
             __freestanding_c_hdrs_clz = __builtin_clzll(__FREESTANDING_C_HDRS_STDBIT_LOW(x)) \
-                                      - (__FREESTANDING_C_HDRS_STDBIT_LLONG \
-                                       - __FREESTANDING_C_HDRS_STDBIT_WIDTH(x)); \
+                                      - __FREESTANDING_C_HDRS_STDBIT_EXTRA(x); \
         } else if (__FREESTANDING_C_HDRS_STDBIT_HIGH(x) != 0) { \
-            __freestanding_c_hdrs_clz = __builtin_clzll(__FREESTANDING_C_HDRS_STDBIT_HIGH(x)); \
+            __freestanding_c_hdrs_clz = __builtin_clzll(__FREESTANDING_C_HDRS_STDBIT_HIGH(x)) \
+                                      - __FREESTANDING_C_HDRS_STDBIT_EXTRA(x); \
         } else { \
             __freestanding_c_hdrs_clz = __FREESTANDING_C_HDRS_STDBIT_LLONG \
-                                      + __builtin_clzll(__FREESTANDING_C_HDRS_STDBIT_LOW(x)); \
+                                      + __builtin_clzll(__FREESTANDING_C_HDRS_STDBIT_LOW(x)) \
+                                      - __FREESTANDING_C_HDRS_STDBIT_EXTRA(x); \
         } \
         __freestanding_c_hdrs_clz; \
     })
